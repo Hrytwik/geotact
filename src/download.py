@@ -94,6 +94,15 @@ def s2_composite(name, datetime, max_cloud=20, bands=S2_BANDS, n_best=8):
         raise RuntimeError(f"S2 {name}: only {len(day_files)}/{len(keep)} days downloaded")
 
     # Stage 2: cloud-masked median, one band at a time (fits in 8 GB RAM).
+    # Harmonise: from processing baseline 04.00 (Jan 2022) L2A values carry BOA_ADD_OFFSET=-1000,
+    # i.e. DN = 10000*reflectance + 1000. Remove it per day so every year shares one scale.
+    offset = {}
+    for f in day_files:
+        day = f.stem
+        pb = max(float(i.properties.get("s2:processing_baseline", "0")) for i in items
+                 if str(i.datetime.date()) == day)
+        offset[f] = 1000.0 if pb >= 4.0 else 0.0
+    log(f"S2 {name}: offset-corrected days {sum(v > 0 for v in offset.values())}/{len(day_files)}")
     import rasterio
     with rasterio.open(day_files[0]) as r0:
         profile, shape = r0.profile, r0.shape
@@ -107,7 +116,7 @@ def s2_composite(name, datetime, max_cloud=20, bands=S2_BANDS, n_best=8):
         for k, f in enumerate(day_files):
             with rasterio.open(f) as r:
                 v = r.read(b + 1).astype(np.float32)
-            stack[k] = np.where(clear[k] & (v > 0), v, np.nan)
+            stack[k] = np.where(clear[k] & (v > 0), np.maximum(v - offset[f], 1.0), np.nan)
         med[b] = np.nan_to_num(np.nanmedian(stack, axis=0), nan=0).astype(np.uint16)
     profile.update(count=len(bands), dtype="uint16", nodata=0, compress="deflate", tiled=True)
     with rasterio.open(out, "w", **profile) as dst:
