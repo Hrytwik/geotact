@@ -4,9 +4,15 @@ Usage: python -m src.download <dataset> [<dataset> ...]   (or "all")
 Each dataset is skipped if its output already exists, so re-runs are cheap.
 """
 import json
+import os
 import sys
 import time
 import warnings
+
+# Streaming Cloud-Optimised GeoTIFFs: fail fast and retry instead of hanging on a stalled read.
+os.environ.update(GDAL_HTTP_TIMEOUT="60", GDAL_HTTP_MAX_RETRY="5", GDAL_HTTP_RETRY_DELAY="3",
+                  GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", GDAL_HTTP_MULTIPLEX="YES",
+                  CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif,.tiff", VSI_CACHE="TRUE")
 
 import numpy as np
 import pandas as pd
@@ -56,12 +62,17 @@ def write_items(items, path):
 
 # ---------------------------------------------------------------- Sentinel-2
 
-def s2_composite(name, datetime, max_cloud=20, bands=S2_BANDS):
+def s2_composite(name, datetime, max_cloud=20, bands=S2_BANDS, n_best=8):
     out = RAW / f"s2_{name}.tif"
     if out.exists():
         return log(f"skip {out.name}")
     items = search("sentinel-2-l2a", datetime, {"eo:cloud_cover": {"lt": max_cloud}})
-    log(f"S2 {name}: {len(items)} scenes")
+    # Slow link (~1 MB/s): keep only the clearest acquisition days for the median composite.
+    days = sorted({i.datetime.date() for i in items},
+                  key=lambda d: min(i.properties["eo:cloud_cover"] for i in items if i.datetime.date() == d))
+    keep = set(days[:n_best])
+    items = [i for i in items if i.datetime.date() in keep]
+    log(f"S2 {name}: {len(items)} items on {len(keep)} clearest days")
     write_items(items, RAW / f"s2_{name}_scenes.json")
     ds = stac_load(items, bands=bands + ["SCL"], bbox=BBOX, crs=CRS, resolution=RES_10,
                    groupby="solar_day", chunks={"x": 512, "y": 512}, dtype="uint16", nodata=0)
@@ -70,7 +81,9 @@ def s2_composite(name, datetime, max_cloud=20, bands=S2_BANDS):
     stack = stack.where(stack > 0)
     med = stack.median("time", skipna=True)
     valid = clear.sum("time")
-    med = med.fillna(0).astype("uint16").compute()
+    from dask.diagnostics import ProgressBar
+    with ProgressBar(dt=60):
+        med = med.fillna(0).astype("uint16").compute()
     med = med.assign_coords(band=bands)
     save_tif(med, out, nodata=0)
     save_tif(valid.astype("uint8").compute(), RAW / f"s2_{name}_clearcount.tif")
@@ -80,15 +93,15 @@ def sentinel2():
     # Target year for mapping (dry season, least cloud).
     s2_composite("2025_26_dry", "2025-11-01/2026-03-31")
     # Label-matched years: WorldCover 2021 and Esri/IO annual LULC 2023 were built from these years.
-    s2_composite("2021", "2021-01-01/2021-12-31", max_cloud=10)
-    s2_composite("2023", "2023-01-01/2023-12-31", max_cloud=10)
+    s2_composite("2021", "2021-01-01/2021-12-31", max_cloud=10, n_best=10)
+    s2_composite("2023", "2023-01-01/2023-12-31", max_cloud=10, n_best=10)
 
 
 def ndvi_years():
     """Dry-season (Nov-Mar) red + NIR composites per year for the vegetation-health trend."""
     for y in range(2018, 2026):
         s2_composite(f"ndvi_{y}_{(y + 1) % 100:02d}", f"{y}-11-01/{y + 1}-03-31",
-                     max_cloud=20, bands=["B04", "B08"])
+                     max_cloud=20, bands=["B04", "B08"], n_best=5)
 
 
 # ---------------------------------------------------------------- Land cover
@@ -205,8 +218,14 @@ def gbif_query(params):
                 hasCoordinate="true", hasGeospatialIssue="false")
     base.update(params)
     url = "https://api.gbif.org/v1/occurrence/search"
-    n = requests.get(url, params={**base, "limit": 0}, headers=UA, timeout=60).json()["count"]
-    return url, base, n
+    for attempt in range(6):
+        try:
+            n = requests.get(url, params={**base, "limit": 0}, headers=UA, timeout=120).json()["count"]
+            return url, base, n
+        except Exception as e:
+            log(f"GBIF count retry {params}: {e}")
+            time.sleep(10 * (attempt + 1))
+    raise RuntimeError(f"GBIF count failed for {params}")
 
 
 def gbif():
