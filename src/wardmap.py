@@ -170,10 +170,47 @@ def layer_text(name):
     return [(t, lon, lat) for (t, _, _), (lon, lat) in zip(out, ll)]
 
 
-def build_wards(lines_gdf):
+def snap_dangles(lines, targets, tol):
+    """Topology clean-up: extend each dangling ward-line end (one touching no other line)
+    to the nearest point on any other linework within `tol` metres. Only line ends move,
+    so thin features (drains, canals) are never collapsed the way a global snap would."""
+    from shapely import STRtree
+    from shapely.geometry import Point
+    from shapely.ops import nearest_points
+
+    pool = list(lines) + list(targets)
+    tree = STRtree(pool)
+    out = []
+    moved = 0
+    for i, ln in enumerate(lines):
+        coords = list(ln.coords)
+        for end in (0, -1):
+            p = Point(coords[end])
+            near = [j for j in tree.query(p.buffer(tol)) if j != i]
+            best = min(near, key=lambda j: pool[j].distance(p), default=None)
+            if best is None or pool[best].distance(p) > tol:
+                continue
+            q = nearest_points(pool[best], p)[0]
+            d = p.distance(q)
+            if d < 1e-9:
+                continue                                  # exactly on another line: noded by union
+            # Overshoot 0.5 m past the target so the lines truly cross and get noded;
+            # the tiny stub left beyond the crossing is discarded by polygonize.
+            ux, uy = (q.x - p.x) / d, (q.y - p.y) / d
+            tip = (q.x + 0.5 * ux, q.y + 0.5 * uy)
+            if end == 0:
+                coords.insert(0, tip)
+            else:
+                coords.append(tip)
+            moved += 1
+        out.append(LineString(coords))
+    print(f"snap_dangles: extended {moved} dangling ends (tol {tol} m)")
+    return out
+
+
+def build_wards(lines_gdf, divider_gdfs=()):
     """Municipal boundary from its marker dots; wards = polygonize(ward lines + boundary)."""
-    from shapely import snap
-    from shapely.geometry import MultiPoint, Point
+    from shapely.geometry import Point
     from shapely.ops import polygonize, unary_union
 
     dots = gpd.GeoSeries([Point(lon, lat) for t, lon, lat in layer_text("municipal_bnd") if t == "marker"],
@@ -186,9 +223,15 @@ def build_wards(lines_gdf):
     print(f"municipal dots={len(dots)} median gap={spacing:.0f} m  city area={city.area / 1e6:.1f} km2")
 
     wl = lines_gdf.to_crs(CRS)
-    merged = unary_union(list(wl.geometry) + [city.exterior])
-    merged = snap(merged, merged, 25.0)
-    polys = [p for p in polygonize(unary_union(merged)) if p.area > 2_000 and city.buffer(50).contains(p.representative_point())]
+    # Where a river/canal/drain forms the ward limit the map draws no separate ward line,
+    # so water edges are added as candidate dividers; unlabelled pieces are merged back by Eliminate.
+    extra = []
+    for g in divider_gdfs:
+        for geom in g.to_crs(CRS).geometry:
+            extra.append(geom.boundary if geom.geom_type in ("Polygon", "MultiPolygon") else geom)
+    ward_lines = snap_dangles(list(wl.geometry), list(extra) + [city.exterior], tol=50.0)
+    merged = unary_union(ward_lines + extra + [city.exterior])   # nodes all linework
+    polys = [p for p in polygonize(merged) if p.area > 2_000 and city.buffer(50).contains(p.representative_point())]
     wards = gpd.GeoDataFrame(geometry=polys, crs=CRS)
 
     labels = [(t, lon, lat) for t, lon, lat in layer_text("ward_poly Anno") if re.fullmatch(r"W\d{1,2}", t)]
@@ -230,18 +273,40 @@ def eliminate(polys):
             break
     df = gpd.GeoDataFrame(dict(ward=[owner[i] for i in geoms]), geometry=list(geoms.values()), crs=polys.crs)
     df = df[df.ward.notna()].dissolve("ward").reset_index()
+    # Snapping leaves hairline (<1 m) gaps between merged pieces: close them.
+    df["geometry"] = df.geometry.buffer(1.0).buffer(-1.0)
     df["ward_no"] = df.ward.str[1:].astype(int)
     df["area_ha"] = (df.area / 1e4).round(1)
     return df.sort_values("ward_no").reset_index(drop=True)
 
 
+def memory_guard(limit_gb=3.0):
+    """Abort the process if resident memory passes limit_gb (8 GB machine safety)."""
+    import os
+    import threading
+
+    import psutil
+
+    proc = psutil.Process()
+
+    def watch():
+        while True:
+            if proc.memory_info().rss > limit_gb * 1e9:
+                print(f"memory_guard: RSS > {limit_gb} GB, aborting", flush=True)
+                os._exit(3)
+            threading.Event().wait(1.0)
+
+    threading.Thread(target=watch, daemon=True).start()
+
+
 if __name__ == "__main__":
+    memory_guard()
     res = extract()
     OUT.unlink(missing_ok=True)
     for name, gdf in res.items():
         if len(gdf):
             gdf.to_crs(CRS).to_file(OUT, layer=name, driver="GPKG")
-    city, wards, labels = build_wards(res["ward_bnd"])
+    city, wards, labels = build_wards(res["ward_bnd"], [res[k] for k in ("river", "canal", "drain_line", "drain_poly")])
     gpd.GeoDataFrame(geometry=[city], crs=CRS).to_file(OUT, layer="municipal_poly", driver="GPKG")
     wards.to_file(OUT, layer="wards", driver="GPKG")
     labels.to_file(OUT, layer="ward_labels", driver="GPKG")
