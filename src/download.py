@@ -74,19 +74,60 @@ def s2_composite(name, datetime, max_cloud=20, bands=S2_BANDS, n_best=8):
     items = [i for i in items if i.datetime.date() in keep]
     log(f"S2 {name}: {len(items)} items on {len(keep)} clearest days")
     write_items(items, RAW / f"s2_{name}_scenes.json")
-    ds = stac_load(items, bands=bands + ["SCL"], bbox=BBOX, crs=CRS, resolution=RES_10,
-                   groupby="solar_day", chunks={"x": 512, "y": 512}, dtype="uint16", nodata=0)
-    clear = ds["SCL"].isin(S2_SCL_KEEP)
-    stack = ds[bands].to_array("band").astype("float32").where(clear)
-    stack = stack.where(stack > 0)
-    med = stack.median("time", skipna=True)
-    valid = clear.sum("time")
-    from dask.diagnostics import ProgressBar
-    with ProgressBar(dt=60):
-        med = med.fillna(0).astype("uint16").compute()
-    med = med.assign_coords(band=bands)
-    save_tif(med, out, nodata=0)
-    save_tif(valid.astype("uint8").compute(), RAW / f"s2_{name}_clearcount.tif")
+
+    # Stage 1: download each acquisition day to disk (resumable; a failed read costs one day).
+    cache = RAW / "s2_cache" / name
+    cache.mkdir(parents=True, exist_ok=True)
+    day_files = []
+    for day in sorted(keep):
+        f = cache / f"{day}.tif"
+        if not f.exists():
+            di = [i for i in items if i.datetime.date() == day]
+            da = load_with_retry(lambda: stac_load(
+                di, bands=bands + ["SCL"], bbox=BBOX, crs=CRS, resolution=RES_10, groupby="solar_day",
+                dtype="uint16", nodata=0).to_array("band").isel(time=0), f"S2 {name} {day}")
+            if da is None:
+                continue
+            save_tif(da.assign_coords(band=bands + ["SCL"]), f, nodata=0)
+        day_files.append(f)
+    if len(day_files) < max(3, len(keep) // 2):
+        raise RuntimeError(f"S2 {name}: only {len(day_files)}/{len(keep)} days downloaded")
+
+    # Stage 2: cloud-masked median, one band at a time (fits in 8 GB RAM).
+    import rasterio
+    with rasterio.open(day_files[0]) as r0:
+        profile, shape = r0.profile, r0.shape
+    clear = np.zeros((len(day_files),) + shape, bool)
+    for k, f in enumerate(day_files):
+        with rasterio.open(f) as r:
+            clear[k] = np.isin(r.read(len(bands) + 1), S2_SCL_KEEP)
+    med = np.zeros((len(bands),) + shape, np.uint16)
+    for b in range(len(bands)):
+        stack = np.full((len(day_files),) + shape, np.nan, np.float32)
+        for k, f in enumerate(day_files):
+            with rasterio.open(f) as r:
+                v = r.read(b + 1).astype(np.float32)
+            stack[k] = np.where(clear[k] & (v > 0), v, np.nan)
+        med[b] = np.nan_to_num(np.nanmedian(stack, axis=0), nan=0).astype(np.uint16)
+    profile.update(count=len(bands), dtype="uint16", nodata=0, compress="deflate", tiled=True)
+    with rasterio.open(out, "w", **profile) as dst:
+        dst.write(med)
+        dst.descriptions = tuple(bands)
+    profile.update(count=1, dtype="uint8", nodata=None)
+    with rasterio.open(RAW / f"s2_{name}_clearcount.tif", "w", **profile) as dst:
+        dst.write(clear.sum(0).astype(np.uint8), 1)
+    log(f"saved {out.name} from {len(day_files)} days; pixels with 0 clear days: {(clear.sum(0) == 0).mean():.2%}")
+
+
+def load_with_retry(fn, label, attempts=4):
+    for a in range(attempts):
+        try:
+            return fn()
+        except Exception as e:
+            log(f"{label}: attempt {a + 1} failed: {type(e).__name__}: {str(e)[:120]}")
+            time.sleep(15 * (a + 1))
+    log(f"{label}: giving up after {attempts} attempts")
+    return None
 
 
 def sentinel2():
@@ -158,10 +199,11 @@ def sentinel1():
             if out.exists():
                 continue
             di = [i for i in items if i.datetime.date() == day]
-            ds = stac_load(di, bands=["vv", "vh"], bbox=BBOX, crs=CRS, resolution=RES_10,
-                           groupby="solar_day", dtype="float32", nodata=np.nan,
-                           chunks={"x": 2048, "y": 2048})
-            da = ds[["vv", "vh"]].to_array("band").isel(time=0).compute()
+            da = load_with_retry(lambda: stac_load(
+                di, bands=["vv", "vh"], bbox=BBOX, crs=CRS, resolution=RES_10, groupby="solar_day",
+                dtype="float32", nodata=np.nan)[["vv", "vh"]].to_array("band").isel(time=0), f"S1 {day}")
+            if da is None:
+                continue
             da = da.assign_coords(band=["vv", "vh"])
             if float(np.isfinite(da.values).mean()) < 0.5:
                 log(f"S1 {day}: <50% coverage, kept anyway")
@@ -298,6 +340,8 @@ DATASETS = dict(dem=dem, landcover=landcover, sentinel2=sentinel2, ndvi=ndvi_yea
                 lst=landsat_lst, rain=rainfall, gbif=gbif, osm=osm)
 
 if __name__ == "__main__":
+    from src.wardmap import memory_guard
+    memory_guard(3.0)
     names = list(DATASETS) if sys.argv[1:] == ["all"] else sys.argv[1:]
     for nm in names:
         log(f"=== {nm}")
