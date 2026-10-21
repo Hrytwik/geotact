@@ -20,7 +20,8 @@ Order of execution: T0, T5, T4, T6, T7(code), T8, T9, T10, (T11).
 ## Task status
 - [x] T0 grid + study mask (7 tests, suite run twice, committed)
 - [x] T5 vegetation trend (12 tests; suite 19/19 twice; outputs/vegetation/)
-- [ ] T4  - [ ] T6  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
+- [x] T4 land-use U-Net (40 tests incl. outputs; suite run twice; outputs/landuse/)
+- [ ] T6  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
 
 ## Common rules
 - Grid: EPSG:32645, 10 m, the Sentinel-2 composite grid (2895 x 2424). Study mask: BMC municipal polygon (166.5 sq km). Wards raster 1-67.
@@ -44,6 +45,8 @@ Split: spatial blocks (no patch leakage). Loss: class-weighted cross-entropy. Se
 Tests: label mapping total; patches finite and correct shape; block split disjoint; model forward shape; tiny-batch overfit reaches > 95 percent; tiled inference reconstructs the full map without seams.
 Evidence: spatial-validation agreement with the weak labels (agreement, NOT accuracy). Real accuracy only from the authors' 300 hand labels, compared for BOTH our map and the Esri map.
 Limitation: the model learns another model's labels; any claim of accuracy waits for T7.
+RESULT (2026-10-21), agreement with the weak Esri labels on held-out 512 px blocks, NOT accuracy: U-Net seed 0 overall 84.74 percent, macro-F1 0.745; seed 1 84.73 percent, macro-F1 0.754 (training 91.9 / 92.1 percent). Majority-class baseline 41.5 percent. Per-pixel LightGBM baseline on the same bands and labels: 70.0 percent, macro-F1 0.628, so spatial context adds about 15 points. Per class (seed 0, F1): built-up 0.93, trees 0.88, cropland 0.86, water 0.79, grass/scrub 0.54, bare ground 0.47 (precision 0.31, only 4,576 held-out pixels). Grass/scrub is confused mainly with cropland and trees; water pixels are sometimes called bare. Seeds agree on 94.4 percent of BMC pixels, but only 49.9 percent of pixels either seed calls grass/scrub (built-up 96.6, water 85.3, bare 85.0, trees 80.4, cropland 73.1). Class shares inside BMC differ between seeds by about 1.5 points for cropland (12.4 vs 10.9) and grass/scrub (5.9 vs 7.3); built-up 73.4 vs 73.6. Primary map: seed 0 (declared before running); report seed spread for crop/grass areas. 2023 composite -> 2025-26 composite (same training statistics): built-up rises 0.6-0.9 points (no collapse) but grass/scrub falls about 2 points in both seeds, probably seasonal (Nov-Feb vs Jan-Apr + Oct-Nov scenes), so do not read 2023 -> 2025 grass/crop changes as land change.
+INCIDENT: the first seed-0 run crashed (SIGSEGV in libomp) when LightGBM started after PyTorch in one process (two OpenMP runtimes). Fixed by process isolation: src/landuse.py imports torch lazily, the baseline lives in src/landuse_baseline.py and runs separately; two regression tests prove neither module drags torch into the baseline process (both failed on the old code). The U-Net weights had been saved before the crash, so seed 0 was evaluated from the saved weights (identical numbers to the training log).
 ### T6 flood-prone zones
 Labels: Sentinel-1 monsoon 2025 water extent (VV dB, speckle filtered, automatic threshold) minus permanent water (dry-season reference), per-pixel flood frequency; scenes chosen after heavy-rain days when ERA5 supports it.
 Features: elevation, slope, HAND, TWI, curvature, log flow accumulation, distance to mapped drains/canals/river/water, WorldCover built-up fraction, median NDVI.
