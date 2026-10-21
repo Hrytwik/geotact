@@ -52,3 +52,34 @@ def test_average_precision_reflects_the_low_prevalence():
     s, y, k = toy(n_pos=100, n_bg=9900, n_nf=0, shift=0.0)
     r = ev.evaluate(s, y, k, n_boot=0)
     assert r["ap"] == pytest.approx(100 / 10000, abs=0.01)                # chance AP equals prevalence
+
+
+def test_paired_diff_of_identical_scores_is_exactly_zero():
+    score, y, kind = toy()
+    r = ev.paired_auc_diff(score, score, y, kind, n_boot=200)
+    assert r["diff"] == 0.0 and r["ci"] == [0.0, 0.0]
+
+
+def test_paired_diff_detects_a_clearly_better_model_and_is_signed_a_minus_b():
+    a, y, kind = toy(shift=2.0, seed=1)
+    b = np.random.default_rng(2).normal(size=len(y)) + 0.5 * y
+    r = ev.paired_auc_diff(a, b, y, kind, n_boot=300)
+    assert r["diff"] > 0.1 and r["ci"][0] > 0
+    r2 = ev.paired_auc_diff(b, a, y, kind, n_boot=300)
+    assert r2["diff"] == pytest.approx(-r["diff"]) and r2["ci"][1] < 0
+
+
+def test_paired_diff_interval_is_tighter_than_unpaired_for_correlated_models():
+    a, y, kind = toy(n_pos=100, seed=3)
+    b = a + np.random.default_rng(4).normal(scale=0.2, size=len(a))     # nearly the same model
+    paired = ev.paired_auc_diff(a, b, y, kind, n_boot=300)
+    ra, rb = ev.evaluate(a, y, kind, n_boot=300), ev.evaluate(b, y, kind, n_boot=300)
+    unpaired_width = (ra["auc_ci"][1] - ra["auc_ci"][0]) + (rb["auc_ci"][1] - rb["auc_ci"][0])
+    assert (paired["ci"][1] - paired["ci"][0]) < 0.5 * unpaired_width
+
+
+def test_paired_diff_rejects_nan_scores():
+    score, y, kind = toy()
+    bad = score.copy(); bad[0] = np.nan
+    with pytest.raises(ValueError):
+        ev.paired_auc_diff(score, bad, y, kind, n_boot=10)

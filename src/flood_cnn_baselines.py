@@ -50,6 +50,17 @@ def logistic_factory(C=1.0):
     return make
 
 
+def forest_factory(seed=0):
+    def make():
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.impute import SimpleImputer
+        from sklearn.pipeline import make_pipeline
+        return make_pipeline(SimpleImputer(strategy="median"),
+                             RandomForestClassifier(n_estimators=300, min_samples_leaf=5, class_weight="balanced_subsample",
+                                                    n_jobs=4, random_state=seed))
+    return make
+
+
 def lgbm_factory(seed=0):
     def make():
         import lightgbm as lgb
@@ -90,7 +101,8 @@ def run(seed=0, n_boot=1000):
     print(f"samples {len(y)}  flood {int(y.sum())}  features {X.shape[1]}  flood per fold "
           f"{[int(((folds == k) & (y == 1)).sum()) for k in np.unique(folds)]}", flush=True)
 
-    scores = {"lightgbm": cv_scores(X, y, folds, lgbm_factory(seed)), "logistic": cv_scores(X, y, folds, logistic_factory())}
+    scores = {"lightgbm": cv_scores(X, y, folds, lgbm_factory(seed)), "logistic": cv_scores(X, y, folds, logistic_factory()),
+              "forest": cv_scores(X, y, folds, forest_factory(seed))}
     for name, v in single_layer_scores(stack, rows, cols, fd.CHANNELS).items():
         scores[f"layer_{name}"] = v
     with rasterio.open(OUTPUTS / "flood" / "susceptibility_30m.tif") as r:

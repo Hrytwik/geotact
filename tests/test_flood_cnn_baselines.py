@@ -89,3 +89,16 @@ def test_cv_never_trains_on_the_held_out_fold():
     bl.cv_scores(X, np.zeros(50, int), folds, Spy)
     for k, seen in enumerate(Spy.seen):
         assert not any(i % 5 == k for i in seen)
+
+
+def test_forest_factory_survives_nan_and_learns_a_clean_signal():
+    rng = np.random.default_rng(5)
+    n = 600
+    y = (rng.random(n) < 0.2).astype(int)
+    X = rng.normal(size=(n, 4)); X[:, 0] += 2.0 * y
+    X[::9, 1] = np.nan
+    folds = rng.integers(0, 5, size=n)
+    oof = bl.cv_scores(X, y, folds, bl.forest_factory())
+    assert np.isfinite(oof).all()
+    from sklearn.metrics import roc_auc_score
+    assert roc_auc_score(y, oof) > 0.85

@@ -29,3 +29,21 @@ def evaluate(score, y, kind, n_boot=1000, seed=0):
         for j, name in enumerate(("auc", "ap", "auc_nonflood")):
             out[f"{name}_ci"] = [float(np.percentile(b[:, j], 2.5)), float(np.percentile(b[:, j], 97.5))]
     return out
+
+
+def paired_auc_diff(score_a, score_b, y, kind, n_boot=1000, seed=0):
+    """Pooled AUC of model A minus model B, with a paired bootstrap 95 percent interval: both models are rescored on the SAME
+    resampled samples (within kind), so the interval reflects the difference and not each model's own spread."""
+    from sklearn.metrics import roc_auc_score
+    a, b = np.asarray(score_a, float), np.asarray(score_b, float)
+    y, kind = np.asarray(y), np.asarray(kind)
+    if not (np.isfinite(a).all() and np.isfinite(b).all()):
+        raise ValueError("scores contain NaN or inf; fix them before evaluating")
+    diff = float(roc_auc_score(y, a) - roc_auc_score(y, b))
+    rng = np.random.default_rng(seed)
+    groups = [np.flatnonzero(kind == k) for k in np.unique(kind)]
+    d = []
+    for _ in range(n_boot):
+        idx = np.concatenate([rng.choice(g, size=len(g), replace=True) for g in groups])
+        d.append(roc_auc_score(y[idx], a[idx]) - roc_auc_score(y[idx], b[idx]))
+    return dict(diff=diff, ci=[float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))] if n_boot else [diff, diff])
