@@ -191,6 +191,40 @@ def run(steps=STEPS, seeds=SEEDS, n_boot=1000, tag="benchmark"):
     return res
 
 
+def fit_all_and_score(seeds=SEEDS, steps=STEPS):
+    """T6h stage 1: train the CNN and the MLP (mean over seeds) on ALL field samples and score every non-water city cell.
+    Never reads the hotspots."""
+    from src import flood_cnn_baselines as bl
+    from src import flood_cnn_data as fd
+    from src import flood_cnn_r3 as r3
+    from src.config import OUTPUTS
+
+    d = fd.build(0)
+    s, stack = d["samples"], d["stack"]
+    ref = d["bmc"] & ~d["water"]
+    src = fd.PatchSource(stack)
+    X, _ = bl.features(stack, s["rows"], s["cols"], fd.CHANNELS)
+    means = bl.local_means(stack)
+    centre = np.asarray(stack, dtype="float32")
+    patches = src.get(s["rows"], s["cols"])
+    cnns = [train_cnn(patches, s["y"], seed=sd, steps=steps) for sd in seeds]
+    mlps = [train_mlp(X, s["y"], seed=sd, steps=steps) for sd in seeds]
+    del patches
+
+    def cnn_fn(rows, cols):
+        x = src.get(rows, cols)
+        return np.mean([_predict(m, x) for m in cnns], axis=0)
+
+    def mlp_fn(rows, cols):
+        x = np.hstack([centre[:, rows, cols].T, means[:, rows, cols].T])
+        return np.mean([_predict(m, x) for m in mlps], axis=0)
+
+    for name, fn in (("cnn", cnn_fn), ("mlp", mlp_fn)):
+        m = r3.score_map(ref, fn, chunk=2048)
+        np.save(OUTPUTS / "flood_cnn" / f"r3_scores_{name}.npy", m)
+        print(f"{name}: scored {int(np.isfinite(m).sum())} cells, score range {np.nanmin(m):.4f}-{np.nanmax(m):.4f}", flush=True)
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -201,6 +235,7 @@ if __name__ == "__main__":
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--tag", default="benchmark")
     ap.add_argument("--limit-gb", type=float, default=4.0)
+    ap.add_argument("--fit-all", action="store_true")
     a = ap.parse_args()
     memory_guard(a.limit_gb)
-    run(a.steps, a.seeds, a.n_boot, a.tag)
+    fit_all_and_score(a.seeds, a.steps) if a.fit_all else run(a.steps, a.seeds, a.n_boot, a.tag)

@@ -118,7 +118,36 @@ def run(seed=0, n_boot=1000):
     return res
 
 
+
+
+# ---------------------------------------------------------------- T6h stage 1: refit on ALL field points, save score maps
+def fit_all_and_score(seed=0):
+    """Fit logistic, forest and LightGBM on all samples and score every non-water city cell. Never reads the hotspots."""
+    from src import flood_cnn_data as fd
+    from src import flood_cnn_r3 as r3
+    from src.config import OUTPUTS
+
+    d = fd.build(seed)
+    s, stack = d["samples"], d["stack"]
+    ref = d["bmc"] & ~d["water"]
+    X, _ = features(stack, s["rows"], s["cols"], fd.CHANNELS)
+    means = local_means(stack)
+    centre = np.asarray(stack, dtype="float32")
+
+    def cell_features(rows, cols):
+        return np.hstack([centre[:, rows, cols].T, means[:, rows, cols].T])
+
+    for name, make in (("logistic", logistic_factory()), ("forest", forest_factory(seed)), ("lightgbm", lgbm_factory(seed))):
+        model = make()
+        model.fit(X, s["y"])
+        m = r3.score_map(ref, lambda r, c: model.predict_proba(cell_features(r, c))[:, 1])
+        np.save(OUTPUTS / "flood_cnn" / f"r3_scores_{name}.npy", m)
+        print(f"{name}: scored {int(np.isfinite(m).sum())} cells, score range {np.nanmin(m):.4f}-{np.nanmax(m):.4f}", flush=True)
+
+
 if __name__ == "__main__":
+    import sys
+
     from src.wardmap import memory_guard
     memory_guard(3.0)
-    run()
+    fit_all_and_score() if "--fit-all" in sys.argv else run()
