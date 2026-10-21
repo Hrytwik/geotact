@@ -17,6 +17,10 @@ T10 NSGA-II                needs T9
 T11 transfer test (bonus)  needs T4-T10; only if time allows (slow link: needs new downloads)
 Order of execution: T0, T5, T4, T6, T7(code), T8, T9, T10, (T11).
 
+## Task status
+- [x] T0 grid + study mask (7 tests, suite run twice, committed)
+- [ ] T5  - [ ] T4  - [ ] T6  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
+
 ## Common rules
 - Grid: EPSG:32645, 10 m, the Sentinel-2 composite grid (2895 x 2424). Study mask: BMC municipal polygon (166.5 sq km). Wards raster 1-67.
 - Every task: tests written first and seen failing; implementation; full suite twice; interface check against the next task's needs; then commit + doc + memory.
@@ -42,6 +46,7 @@ Limitation: the model learns another model's labels; any claim of accuracy waits
 Labels: Sentinel-1 monsoon 2025 water extent (VV dB, speckle filtered, automatic threshold) minus permanent water (dry-season reference), per-pixel flood frequency; scenes chosen after heavy-rain days when ERA5 supports it.
 Features: elevation, slope, HAND, TWI, curvature, log flow accumulation, distance to mapped drains/canals/river/water, WorldCover built-up fraction, median NDVI.
 Model: gradient boosting with spatially blocked cross-validation. Check: percentile rank of the 19 hotspot points inside BMC, versus elevation-only and HAND-only baselines and a random baseline, with bootstrap intervals.
+DATA FACT (checked 2026-10-21, data/interim/s1_inventory.csv): of 33 monsoon scenes only 25 cover more than 95 percent of the study area (8 cover under 50 percent, edge-of-swath); of 26 dry scenes 18 are usable (1 failed download). Use only full-coverage scenes. Heaviest ERA5 day (3 Sep, 72 mm) has no scene within 3 days; usable scenes with more than 15 mm the day before: 27 Jun, 24 Jul, 26 Aug (24.4 mm). Scenes alternate in 3-day pairs (two orbits), so thresholds are set per scene.
 KNOWN GAP: SAR cannot see street flooding in dense built-up areas (double-bounce); labels mostly capture open-area inundation. The hotspot check is therefore the independent test, and the limitation goes in the chapter.
 Tests: synthetic DEM with known HAND; threshold function on a synthetic bimodal image; permanent-water exclusion; spatial CV folds disjoint; hotspot-rank function on toy data.
 ### T7 accuracy estimator (code now, run when labels arrive)
