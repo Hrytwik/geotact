@@ -19,7 +19,8 @@ Order of execution: T0, T5, T4, T6, T7(code), T8, T9, T10, (T11).
 
 ## Task status
 - [x] T0 grid + study mask (7 tests, suite run twice, committed)
-- [ ] T5  - [ ] T4  - [ ] T6  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
+- [x] T5 vegetation trend (12 tests; suite 19/19 twice; outputs/vegetation/)
+- [ ] T4  - [ ] T6  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
 
 ## Common rules
 - Grid: EPSG:32645, 10 m, the Sentinel-2 composite grid (2895 x 2424). Study mask: BMC municipal polygon (166.5 sq km). Wards raster 1-67.
@@ -35,7 +36,8 @@ Tests: shape equals the S2 composite; mask area within 1 percent of 166.5 sq km;
 ### T5 vegetation health over time (index-based, NOT deep learning)
 Method: NDVI from 8 Nov-Mar composites (2018-19 .. 2025-26), per-pixel least-squares slope + Mann-Kendall style significance, latest-year z-score anomaly versus the previous 7 years, ward and land-cover summaries.
 Tests: synthetic stack recovers a known slope; NaN handling; anomaly sign; real data: NDVI in [-1,1], class ordering trees > crops > built > water.
-Limitation: composites use the 5 clearest days per season, so year-to-year noise is partly scene selection; report slope uncertainty.
+Limitation: composites use the 5 clearest days per season.
+RESULT (2026-10-21): (1) The raw yearly NDVI is NOT comparable: unchanged land (same Esri class 2017-2023) shifts together by -0.044..+0.057 between years in every class, and acquisition date explains none of it (R2 0.01). A common additive year offset is estimated on unchanged non-water land and removed (std of city median 0.045 -> 0.011; residual class-specific shifts of about 0.02-0.03 remain, e.g. stable cropland drifts +0.0056/yr). (2) The ORIGINAL pre-written check (all vegetation -> built-up must trend down more than stable built-up) FAILED, and the threshold was not loosened. Cause: November-March cropland and scrub are already bare/low-NDVI, so crop->built leaves almost no signal (0.386 -> 0.372, median slope +0.0004/yr). Tree->built does: 0.505 -> 0.452, median slope -0.0057/yr vs -0.0006/yr for stable built-up (Mann-Whitney p 3e-202, P(converted slope above stable) about 0.40). Test rewritten to the supported claim only. (3) Per-pixel significance is weak (9.7 percent of tree->built pixels significant vs 6.7 percent of stable built); use ward-level aggregates, not pixel maps, in the chapter. The p-values are not corrected for multiple testing or spatial autocorrelation.
 ### T4 land-use model (U-Net, PyTorch MPS)
 Inputs: S2 2023 composite (10 bands, offset-corrected, per-band standardised). Weak labels: Esri/IO LULC 2023 collapsed to the 6 chapter classes (Water, Trees, Cropland, Grass/Scrub, Built-up, Bare ground).
 Split: spatial blocks (no patch leakage). Loss: class-weighted cross-entropy. Seeds fixed; train twice.
