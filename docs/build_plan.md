@@ -21,7 +21,7 @@ Order of execution: T0, T5, T4, T6, T7(code), T8, T9, T10, (T11).
 - [x] T0 grid + study mask (7 tests, suite run twice, committed)
 - [x] T5 vegetation trend (12 tests; suite 19/19 twice; outputs/vegetation/)
 - [x] T4 land-use U-Net (40 tests incl. outputs; suite run twice; outputs/landuse/)
-- [ ] T6 (sub-tasks: [x] T6a SAR evidence functions, 11 tests; [x] T6b terrain (16 tests; outputs/terrain/terrain_features.tif, 10 bands, 30 m); [x] T6c labels (flood_labels.py, 12 tests + 4 output tests; outputs/flood/); [x] T6d model, FROZEN (flood_model.py, 11 + 4 tests; outputs/flood/susceptibility_30m.tif); [x] T6e hotspot test: FAILED, reported not repaired)  - [ ] T6f-T6h deep flood model on field-surveyed locations (protocol registered)  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
+- [ ] T6 (sub-tasks: [x] T6a SAR evidence functions, 11 tests; [x] T6b terrain (16 tests; outputs/terrain/terrain_features.tif, 10 bands, 30 m); [x] T6c labels (flood_labels.py, 12 tests + 4 output tests; outputs/flood/); [x] T6d model, FROZEN (flood_model.py, 11 + 4 tests; outputs/flood/susceptibility_30m.tif); [x] T6e hotspot test: FAILED, reported not repaired)  - [~] T6f data DONE (flood_cnn_data.py, 8 tests; 129 flood cells, 25 non-flood, 10,000 background; flood cells per fold 42/16/32/7/32 so only the POOLED AUC is meaningful); T6g CNN + baselines and T6h hotspot test still to run (protocol registered)  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
 
 ## Common rules
 - Grid: EPSG:32645, 10 m, the Sentinel-2 composite grid (2895 x 2424). Study mask: BMC municipal polygon (166.5 sq km). Wards raster 1-67.
