@@ -123,6 +123,7 @@ def combine(n_boot=1000):
 
     from src import flood_cnn_eval as ev
     from src.config import OUTPUTS
+    from src.flood_cnn_r3 import holm
     X, y, kind, folds, base = load_part_a()
     results = {}
     for name in GRIDS:
