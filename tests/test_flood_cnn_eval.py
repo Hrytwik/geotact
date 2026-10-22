@@ -83,3 +83,14 @@ def test_paired_diff_rejects_nan_scores():
     bad = score.copy(); bad[0] = np.nan
     with pytest.raises(ValueError):
         ev.paired_auc_diff(score, bad, y, kind, n_boot=10)
+
+
+def test_paired_diff_gives_a_two_sided_bootstrap_p_value():
+    a, y, kind = toy(shift=2.0, seed=1)
+    b = np.random.default_rng(2).normal(size=len(y)) + 0.5 * y
+    r = ev.paired_auc_diff(a, b, y, kind, n_boot=400)
+    assert r["p"] < 0.01
+    same = ev.paired_auc_diff(a, a, y, kind, n_boot=100)
+    assert same["p"] == 1.0
+    slight = ev.paired_auc_diff(a, a + np.random.default_rng(5).normal(scale=0.05, size=len(a)), y, kind, n_boot=400)
+    assert 0.0 < slight["p"] <= 1.0

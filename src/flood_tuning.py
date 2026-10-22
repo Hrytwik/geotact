@@ -70,3 +70,89 @@ def stack(results, y, folds):
         lr = LogisticRegression(class_weight="balanced", max_iter=1000).fit(Xtr, y[tr])
         out[te] = lr.predict_proba(Xte)[:, 1]
     return out
+
+
+# ---------------------------------------------------------------- real run (Part A of Amendment 2)
+GRIDS = {
+    "logistic": grid({"C": [0.01, 0.1, 1.0, 10.0]}),
+    "forest": grid({"min_samples_leaf": [5, 20], "max_features": ["sqrt", 0.5]}),
+    "lightgbm": grid({"num_leaves": [7, 15], "learning_rate": [0.03, 0.05], "n_estimators": [200, 400]}),
+    "mlp": grid({"width": [32, 64], "dropout": [0.3, 0.5], "steps": [600, 1500]}),
+}
+OUT_NAME = "tuning_{}.pkl"
+
+
+def load_part_a():
+    """The T6g samples, folds and 32 features, checked against the saved T6g baseline scores."""
+    from src import flood_cnn_baselines as bl
+    from src import flood_cnn_data as fd
+    from src.config import OUTPUTS
+    d = fd.build(0)
+    s = d["samples"]
+    base = np.load(OUTPUTS / "flood_cnn" / "baseline_oof.npz", allow_pickle=True)
+    assert np.array_equal(base["rows"], s["rows"]) and np.array_equal(base["y"], s["y"]), "samples differ from the T6g baseline run"
+    X, _ = bl.features(d["stack"], s["rows"], s["cols"], fd.CHANNELS)
+    return X, s["y"], s["kind"], s["fold"], base
+
+
+def _save(name, res):
+    import pickle
+
+    from src.config import OUTPUTS
+    with open(OUTPUTS / "flood_cnn" / OUT_NAME.format(name), "wb") as f:
+        pickle.dump(res, f)
+
+
+def run_tabular(seed=0):
+    from sklearn.metrics import roc_auc_score
+
+    from src import flood_cnn_baselines as bl
+    X, y, kind, folds, _ = load_part_a()
+    makers = {"logistic": lambda p: bl.logistic_factory(**p)(),
+              "forest": lambda p: bl.forest_factory(seed, **p)(),
+              "lightgbm": lambda p: bl.lgbm_factory(seed, **p)()}
+    for name, make in makers.items():
+        res = nested_family(X, y, folds, make, GRIDS[name])
+        _save(name, res)
+        print(f"{name:9s} outer pooled AUC {roc_auc_score(y, res['outer']):.3f}  chosen per outer fold: {res['chosen']}", flush=True)
+
+
+def combine(n_boot=1000):
+    import json
+    import pickle
+
+    from src import flood_cnn_eval as ev
+    from src.config import OUTPUTS
+    X, y, kind, folds, base = load_part_a()
+    results = {}
+    for name in GRIDS:
+        with open(OUTPUTS / "flood_cnn" / OUT_NAME.format(name), "rb") as f:
+            results[name] = pickle.load(f)
+    cands = {name: r["outer"] for name, r in results.items()}
+    cands["soft_vote (PRIMARY)"] = soft_vote(results, folds)
+    cands["stacking"] = stack(results, y, folds)
+    ref = base["logistic"]
+    out = {}
+    for k, v in cands.items():
+        out[k] = dict(**ev.evaluate(v, y, kind, n_boot=n_boot), vs_t6g_logistic=ev.paired_auc_diff(v, ref, y, kind, n_boot=n_boot))
+    for k, ph in zip(out, holm([out[k]["vs_t6g_logistic"]["p"] for k in out])):
+        out[k]["vs_t6g_logistic"]["p_holm"] = ph
+    out["t6g_untuned_logistic"] = ev.evaluate(ref, y, kind, n_boot=n_boot)
+    out["_chosen"] = {n: r["chosen"] for n, r in results.items()}
+    (OUTPUTS / "flood_cnn" / "tuning_result.json").write_text(json.dumps(out, indent=1, default=str))
+    np.savez_compressed(OUTPUTS / "flood_cnn" / "tuning_scores.npz", y=y, kind=kind, fold=folds, **{k.split(" ")[0]: v for k, v in cands.items()})
+    r0 = out["t6g_untuned_logistic"]
+    print(f"{'t6g untuned logistic':22s} AUC {r0['auc']:.3f} [{r0['auc_ci'][0]:.3f}, {r0['auc_ci'][1]:.3f}]  AP {r0['ap']:.3f}")
+    for k in cands:
+        r, d = out[k], out[k]["vs_t6g_logistic"]
+        print(f"{k:22s} AUC {r['auc']:.3f} [{r['auc_ci'][0]:.3f}, {r['auc_ci'][1]:.3f}]  AP {r['ap']:.3f}  vs field non-flood {r['auc_nonflood']:.3f}  "
+              f"minus T6g logistic {d['diff']:+.3f} [{d['ci'][0]:+.3f}, {d['ci'][1]:+.3f}] p {d['p']:.3f} Holm {d['p_holm']:.3f}")
+    return out
+
+
+if __name__ == "__main__":
+    import sys
+
+    from src.wardmap import memory_guard
+    memory_guard(3.0)
+    run_tabular() if "--tabular" in sys.argv else combine()

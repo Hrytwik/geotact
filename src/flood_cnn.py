@@ -241,6 +241,17 @@ def fit_all_and_score(seeds=SEEDS, steps=STEPS):
         print(f"{name}: scored {int(np.isfinite(m).sum())} cells, score range {np.nanmin(m):.4f}-{np.nanmax(m):.4f}", flush=True)
 
 
+def run_mlp_tuning():
+    """Part A: nested search for the tabular MLP (3 seeds everywhere), saved for the combine step."""
+    from sklearn.metrics import roc_auc_score
+
+    from src import flood_tuning as tu
+    X, y, kind, folds, _ = tu.load_part_a()
+    res = tu.nested_family(X, y, folds, lambda p: MLPEstimator(p["width"], p["dropout"], p["steps"], SEEDS), tu.GRIDS["mlp"])
+    tu._save("mlp", res)
+    print(f"mlp       outer pooled AUC {roc_auc_score(y, res['outer']):.3f}  chosen per outer fold: {res['chosen']}", flush=True)
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -252,6 +263,10 @@ if __name__ == "__main__":
     ap.add_argument("--tag", default="benchmark")
     ap.add_argument("--limit-gb", type=float, default=4.0)
     ap.add_argument("--fit-all", action="store_true")
+    ap.add_argument("--tune-mlp", action="store_true")
     a = ap.parse_args()
     memory_guard(a.limit_gb)
-    fit_all_and_score(a.seeds, a.steps) if a.fit_all else run(a.steps, a.seeds, a.n_boot, a.tag)
+    if a.tune_mlp:
+        run_mlp_tuning()
+    else:
+        fit_all_and_score(a.seeds, a.steps) if a.fit_all else run(a.steps, a.seeds, a.n_boot, a.tag)

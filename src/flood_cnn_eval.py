@@ -46,4 +46,7 @@ def paired_auc_diff(score_a, score_b, y, kind, n_boot=1000, seed=0):
     for _ in range(n_boot):
         idx = np.concatenate([rng.choice(g, size=len(g), replace=True) for g in groups])
         d.append(roc_auc_score(y[idx], a[idx]) - roc_auc_score(y[idx], b[idx]))
-    return dict(diff=diff, ci=[float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))] if n_boot else [diff, diff])
+    d = np.asarray(d)
+    p = float(min(1.0, 2 * min((d <= 0).mean(), (d >= 0).mean()))) if n_boot else float("nan")
+    return dict(diff=diff, ci=[float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))] if n_boot else [diff, diff],
+                p=max(p, 1.0 / (n_boot + 1)) if n_boot else p)
