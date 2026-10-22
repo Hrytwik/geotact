@@ -56,12 +56,12 @@ class FloodCNN(nn.Module):
 class TabMLP(nn.Module):
     """Two hidden layers of 64, ReLU, dropout 0.3. Median-imputes and z-scores its own input with training statistics."""
 
-    def __init__(self, d, median=None, mean=None, std=None):
+    def __init__(self, d, median=None, mean=None, std=None, width=64, dropout=0.3):
         super().__init__()
         for name, v, default in (("median", median, 0.0), ("mean", mean, 0.0), ("std", std, 1.0)):
             self.register_buffer(name, torch.as_tensor(np.full(d, default, "float32") if v is None else v))
-        self.net = nn.Sequential(nn.Linear(d, 64), nn.ReLU(), nn.Dropout(0.3), nn.Linear(64, 64), nn.ReLU(), nn.Dropout(0.3),
-                                 nn.Linear(64, 1))
+        self.net = nn.Sequential(nn.Linear(d, width), nn.ReLU(), nn.Dropout(dropout), nn.Linear(width, width), nn.ReLU(),
+                                 nn.Dropout(dropout), nn.Linear(width, 1))
 
     def forward(self, x):
         x = torch.where(torch.isnan(x), self.median, x)
@@ -109,13 +109,29 @@ def train_cnn(x, y, seed=0, steps=STEPS, batch=BATCH):
     return _fit(FloodCNN(x.shape[1], mean, std), lambda idx, rng: augment(x[idx], rng), y, seed, steps, batch)
 
 
-def train_mlp(X, y, seed=0, steps=STEPS, batch=BATCH):
+def train_mlp(X, y, seed=0, steps=STEPS, batch=BATCH, width=64, dropout=0.3):
     X, y = np.asarray(X, dtype="float32"), np.asarray(y)
     median = np.nanmedian(X, axis=0)
     filled = np.where(np.isnan(X), median, X)
     mean, std = filled.mean(axis=0), filled.std(axis=0)
     torch.manual_seed(seed)
-    return _fit(TabMLP(X.shape[1], median, mean, np.where(std < 1e-6, 1.0, std)), lambda idx, rng: X[idx], y, seed, steps, batch)
+    return _fit(TabMLP(X.shape[1], median, mean, np.where(std < 1e-6, 1.0, std), width, dropout), lambda idx, rng: X[idx], y, seed,
+                steps, batch)
+
+
+class MLPEstimator:
+    """fit / predict_proba wrapper (mean over seeds) so the tabular MLP can be tuned like the other families."""
+
+    def __init__(self, width=64, dropout=0.3, steps=STEPS, seeds=SEEDS):
+        self.width, self.dropout, self.steps, self.seeds = width, dropout, steps, tuple(seeds)
+
+    def fit(self, X, y):
+        self.models = [train_mlp(X, y, seed=sd, steps=self.steps, width=self.width, dropout=self.dropout) for sd in self.seeds]
+        return self
+
+    def predict_proba(self, X):
+        p = np.mean([_predict(m, X) for m in self.models], axis=0)
+        return np.column_stack([1 - p, p])
 
 
 def _predict(model, x, batch=512):

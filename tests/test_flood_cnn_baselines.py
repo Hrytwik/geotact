@@ -102,3 +102,28 @@ def test_forest_factory_survives_nan_and_learns_a_clean_signal():
     assert np.isfinite(oof).all()
     from sklearn.metrics import roc_auc_score
     assert roc_auc_score(y, oof) > 0.85
+
+
+def test_factories_accept_search_parameters_and_keep_the_t6g_defaults():
+    import inspect
+    assert inspect.signature(bl.lgbm_factory).parameters["num_leaves"].default == 15
+    assert inspect.signature(bl.lgbm_factory).parameters["n_estimators"].default == 300
+    assert inspect.signature(bl.forest_factory).parameters["min_samples_leaf"].default == 5
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(200, 3)); y = (X[:, 0] > 0.5).astype(int)
+    for make in (bl.forest_factory(0, 20, 0.5), bl.logistic_factory(0.1)):
+        m = make(); m.fit(X, y)
+        assert m.predict_proba(X).shape == (200, 2)
+
+
+def test_lightgbm_factory_with_search_parameters_fits_in_its_own_process():
+    """LightGBM is fitted in a subprocess: in this environment, fitting it in a process that has already imported torch crashes
+    (exit -11, checked 2026-10-22), and other test files import torch."""
+    import subprocess
+    import sys
+    code = ("import numpy as np; from src import flood_cnn_baselines as bl\n"
+            "rng = np.random.default_rng(0); X = rng.normal(size=(200, 3)); y = (X[:, 0] > 0.5).astype(int)\n"
+            "m = bl.lgbm_factory(0, num_leaves=7, learning_rate=0.03, n_estimators=50)(); m.fit(X, y)\n"
+            "assert m.predict_proba(X).shape == (200, 2); print('OK')")
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=120)
+    assert r.returncode == 0 and "OK" in r.stdout, r.stderr[-300:]

@@ -50,21 +50,22 @@ def logistic_factory(C=1.0):
     return make
 
 
-def forest_factory(seed=0):
+def forest_factory(seed=0, min_samples_leaf=5, max_features="sqrt"):
     def make():
         from sklearn.ensemble import RandomForestClassifier
         from sklearn.impute import SimpleImputer
         from sklearn.pipeline import make_pipeline
         return make_pipeline(SimpleImputer(strategy="median"),
-                             RandomForestClassifier(n_estimators=300, min_samples_leaf=5, class_weight="balanced_subsample",
+                             RandomForestClassifier(n_estimators=300, min_samples_leaf=min_samples_leaf, max_features=max_features,
+                                                    class_weight="balanced_subsample",
                                                     n_jobs=4, random_state=seed))
     return make
 
 
-def lgbm_factory(seed=0):
+def lgbm_factory(seed=0, num_leaves=15, learning_rate=0.05, n_estimators=300):
     def make():
         import lightgbm as lgb
-        return lgb.LGBMClassifier(n_estimators=300, num_leaves=15, learning_rate=0.05, min_child_samples=20, subsample=0.8,
+        return lgb.LGBMClassifier(n_estimators=n_estimators, num_leaves=num_leaves, learning_rate=learning_rate, min_child_samples=20, subsample=0.8,
                                   subsample_freq=1, colsample_bytree=0.8, reg_lambda=1.0, scale_pos_weight=20.0, n_jobs=4,
                                   verbose=-1, random_state=seed)
     return make

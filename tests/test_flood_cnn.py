@@ -93,3 +93,14 @@ def test_seed_averaging_returns_the_mean_of_the_seed_scores():
     avg = fc.cv_cnn(x, y, folds, seeds=(0, 1), steps=40, batch=32)
     assert per_seed.shape == (2, 150)
     assert np.allclose(avg, per_seed.mean(axis=0), atol=1e-6)
+
+
+def test_mlp_estimator_has_the_sklearn_interface_and_respects_width_and_dropout():
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(300, 5)); y = (rng.random(300) < 0.3).astype(int); X[:, 0] += 2 * y
+    est = fc.MLPEstimator(width=16, dropout=0.5, steps=60, seeds=(0, 1)).fit(X, y)
+    p = est.predict_proba(X)
+    assert p.shape == (300, 2) and np.allclose(p.sum(axis=1), 1.0, atol=1e-6)
+    assert est.models[0].net[0].out_features == 16 and est.models[0].net[2].p == 0.5
+    from sklearn.metrics import roc_auc_score
+    assert roc_auc_score(y, p[:, 1]) > 0.8
