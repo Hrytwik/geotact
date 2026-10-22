@@ -1,0 +1,64 @@
+id,name,verbatim_name,tier_claimed,lat,lon,plus_code,date,n_sources,decode_err_m,in_city,on_mapped_water,d_nearest_hotspot_m,d_nearest_survey_flood_m,doubtful,excluded_reason,use_in_training
+WL1,"ISKCON Temple Road (NH-16 Service Road, Nayapalli)",Iskcon temple road in Nayapalli,1,20.2874,85.8112,7MG77RP6+XF3,2024-06-29,4,3.0,True,False,411.0,156.0,False,,True
+LOC-02,"Krishna Tower (Opp. ISKCON Temple, NH-16, Behera Sahi Lane 2, Nayapalli)",Krishna Tower,1,20.2874,85.8149,7MG77RP7+XXF,2017-07-10,2,5.0,True,False,320.0,412.0,False,,True
+LOC-03,"Indradhanu Market (IRC Village, Nayapalli)",Indradhanu market,1,20.289,85.8134,7MG77RQ7+J96,2017-07-10,2,4.0,True,False,134.0,225.0,False,within 300 m of an exam hotspot,False
+WL3,Nayapalli Behera Sahi (Downstream of NH-16 along Drain No. 4),Nayapalli Behera Sahi,2,20.2849,85.82,7MG77RM9+XXG,2018-10-12,2,6.0,True,False,0.0,580.0,False,within 300 m of an exam hotspot,False
+LOC-05,"Damayanti Apartment (Beherasahi / Nilakantha Nagar, Ward 38)",Damayanti apartment in ward no. 38,1,20.2872,85.817,7MG77RP8+VRR,2025-10-08,1,4.0,True,False,404.0,618.0,True,,True
+WL6,Balitothasahi / Balitota Sahi (Syed Mumtaz Ali Govt High School to Bada Sahi),Balitota Sahi / Balitoka Sahi,2,20.2837,85.8166,7MG77RM8+FJQ,2024-06-01,4,2.0,True,False,305.0,239.0,False,,True
+LOC-07,"Madhusudan Nagar (Bidyut Marg / Kalinga Stadium Square, Unit-4)",Madhusudan Nagar,3,20.2846,85.827,7MG77RMG+RRV,2026-08-06,1,5.0,True,False,732.0,621.0,False,,True
+LOC-08,Shastri Nagar (Unit-4 Low-Lying Residential Lanes),Shastri Nagar,3,20.2815,85.8235,7MG77RMF+J9,2017-07-10,1,283.0,True,False,525.0,413.0,True,,True
+WL2,Jayadev Vihar Square & NH-16 Flyover / Nandankanan Rd Approach,Jayadev Vihar,1,20.2984,85.8239,7MG77RXF+9HF,2023-09-02,4,5.0,True,False,1223.0,191.0,False,,True
+LOC-10,"Bishnupriya Apartment (Lane 11, Jayadev Vihar, Ward 26 & Hotel Sandy's Tower Stretch)",Bishnupriya Apartment at Jaydev Vihar / Hotel Sandy's Tower,1,20.2995,85.8215,7MG77RXC+RP,2023-09-02,2,33.0,True,False,1308.0,254.0,False,,True
+WL4,Acharya Vihar Square & NH-16 Overbridge / Low-Lying Pocket,Acharya Vihar,1,20.297,85.8333,7MG77RWM+R84,2017-07-10,3,3.0,True,False,280.0,1136.0,False,within 300 m of an exam hotspot,False
+LOC-12,Vani Vihar Square & NH-16 Underpass (Utkal University Frontage),Vani Vihar underpass,1,20.2965,85.8427,7MG77RWV+H3P,2026-08-16,3,4.0,True,False,767.0,525.0,False,,True
+LOC-13,Satsang Vihar NH-16 Underpass (BSNL / Income Tax Colony),Satsang Vihar area ... underpass,1,20.2973,85.8483,7MG77RWX+W84,2026-08-16,1,5.0,True,False,720.0,255.0,False,,True
+LOC-14,"Shantipalli Basti, Saheed Nagar (along Drain No. 10)",Shantipalli Basti in Saheed Nagar,2,20.291,85.8456,7MG77RRW+96W,2026-08-06,1,3.0,True,False,409.0,497.0,False,,True
+WL7,Rasulgarh Square (Cuttack-Puri Rd & NH-16 Junction),Rasulgarh Square,1,20.2949,85.8577,7MG77VV5+W3X,2022-08-10,5,5.0,True,False,674.0,937.0,False,,True
+LOC-16,"Ratna Villa / Ratna Village (Nigamananda Nagar / Jagannath Nagar, Rasulgarh)",Ratna Villa,1,20.285,85.8598,7MG77VM5+XWW,2018-10-12,1,3.0,True,False,1208.0,912.0,False,,True
+LOC-17,"GGP Colony, Tarini Basti & Jagannath Basti (Rasulgarh / Canal Rd)",GGP Colony / Tarini Basti and Jagannath Basti under GGP Colony,2,20.2944,85.8633,7MG77VV7+Q8G,2026-08-06,2,5.0,True,False,357.0,445.0,False,,True
+WL5,Bomikhal Flyover & Cuttack Road Stretch (Ward 31 / Ward 32),Bomikhal-Rasulgarh stretch / road under Bomikhal flyover,1,20.2792,85.8565,7MG77VH4+MHP,2024-06-29,5,5.0,True,False,1035.0,874.0,False,,True
+LOC-19,"Gayatri Nagar, Bomikhal / Jharapada (Behind Ekamra Cinema Hall)",Gayatri Nagar,2,20.2831,85.8605,7MG77VM6+66C,2022-08-10,1,4.0,True,False,991.0,1036.0,False,,True
+LOC-20,Satyanagar (Janpath to Cuttack-Puri Rd ROB Approach),Satyanagar,3,20.2785,85.8465,7MG77RHW+9J,2017-07-10,3,10.0,True,False,1319.0,645.0,False,,True
+LOC-21,Bairagi Nagar (Jharapada Canal Road along Drain No. 10),Bairagi Nagar,2,20.2735,85.852,7MG77VF2+9R,2023-06-22,1,10.0,True,True,530.0,1145.0,False,on mapped water,False
+LOC-22,Jharpada / Jharapada Low-Lying Areas (Jail Rd / Canal Rd),Jharpada,3,20.276,85.855,7MG77VG4+92,2023-09-02,2,10.0,True,False,722.0,1015.0,False,,True
+WL8,Laxmi Sagar Village & BDA Colony (Laxmisagar Primary School),Laxmisagar village / Laxmi Sagar,2,20.2682,85.8563,7MG77V94+7GF,2024-06-29,5,1.0,True,False,215.0,652.0,False,within 300 m of an exam hotspot,False
+LOC-24,Panabaraj Basti in Ward No. 43 (Laxmisagar),Panabaraj basti in ward no. 43,2,20.2659,85.8561,7MG77V84+9FC,2025-10-08,1,6.0,True,False,421.0,415.0,False,,True
+LOC-25,Kalpana Square / Kalpana Chhak (Cuttack-Puri Rd),Kalpana Square / Kalpana Chack,1,20.2579,85.8448,7MG77R5V+5W3,2022-08-10,3,1.0,True,False,333.0,201.0,False,,True
+WL10,Sabar Sahi (Laxmisagar / Badagada Canal near Kalpana Square),Sabar Sahi,2,20.2595,85.8475,7MG77R5W+RX,2022-08-10,5,10.0,True,False,0.0,235.0,False,within 300 m of an exam hotspot,False
+WL9,Badagada & Badagada Canal Road (Badagada Village / BRIT Colony),Badagada,2,20.2528,85.8496,7MG77R3X+4R5,2025-07-04,2,4.0,True,False,773.0,605.0,False,,True
+LOC-28,Tankapani Road Sai Temple / Sai Mandir Square (Baragarh),Sai Mandir area on Tankapani Road / Taknapani Road Sai Temple,1,20.2532,85.8583,7MG77V35+78P,2026-08-16,2,3.0,True,False,1326.0,201.0,False,,True
+WL11,"Gouri Nagar, Gouri Garden & Kotitirtha Lane (Old Town)",Gouri Nagar / Gouri Garden / Kotitirtha Lane area,2,20.2378,85.8356,7MG76RQP+46H,2018-10-12,3,2.0,True,False,0.0,214.0,False,within 300 m of an exam hotspot,False
+LOC-30,"Gouri Sankar English Medium School, Shriram Nagar & Mahavir Lane (Gouri Nagar, Old Town)",Gouri Sankar English Medium School / Shriram Nagar,1,20.2405,85.8403,7MG76RRR+644,2018-10-12,3,3.0,True,False,0.0,112.0,False,within 300 m of an exam hotspot,False
+LOC-31,Ananta Basudev Temple & Kedargouri / Old Town Area,Ananta Basudev Temple area / parts of Old Town,1,20.2427,85.8405,7MG76RVR+35P,2023-06-22,3,5.0,True,True,244.0,261.0,False,on mapped water; within 300 m of an exam hotspot,False
+LOC-32,Nuagaon (NH-316 / Daya West Canal Outfall),Nuagaon,3,20.2147,85.8418,7MG76R7R+VPW,2026-08-16,1,5.0,False,False,1879.0,644.0,False,outside city mask,False
+LOC-33,Sundarpada (Jatni Road / Bhimatangi Border),Sundarpada,3,20.2322,85.8153,7MG76RJ8+V4W,2026-08-16,1,5.0,True,False,2209.0,633.0,False,,True
+LOC-34,Sweety Complex in Bhimpur (Aerodrome Area South),Sweety Complex in Bhimpur,2,20.237,85.8215,7MG76RPC+QHW,2024-06-29,1,5.0,True,False,1476.0,288.0,False,,True
+WL15,New Forest Park Area & Sishu Bhawan Square (Bapuji Nagar Market),New Forest Park area / Sishu Bhawan square to Spring Tank square,1,20.2557,85.832,7MG77R4J+7QP,2024-06-29,2,5.0,True,False,1594.0,875.0,False,,True
+LOC-36,"Rajmahal Square Overbridge (Janpath / Ashok Nagar, Unit-2)",Rajmahal Square,1,20.2666,85.8418,7MG77R8R+MP2,2017-07-10,3,5.0,True,False,986.0,1127.0,False,,True
+LOC-37,"Surya Nagar (Unit-7, Governor House-Gopabandhu Sq Corridor)",Surya Nagar,3,20.268,85.819,7MG77R99+6J,2023-06-22,1,10.0,True,False,981.0,843.0,False,,True
+LOC-38,Soubhagya Nagar (Baramunda-Siripur Corridor along Drain No. 8),Soubhagya Nagar,2,20.267,85.8106,7MG77R86+Q6X,2023-09-02,2,2.0,True,False,985.0,523.0,False,,True
+WL12,Paika Nagar (Baramunda-Paika Nagar Rd along Drain No. 8),Paika Nagar,2,20.2757,85.8038,7MG77RG3+7GF,2024-06-29,3,1.0,True,False,288.0,904.0,False,within 300 m of an exam hotspot,False
+LOC-40,Baramunda (NH-16 Service Road & Bus Stand Approach),Baramunda,2,20.2712,85.7905,7MG77QCR+F6R,2022-08-10,3,4.0,True,False,1398.0,780.0,False,,True
+LOC-41,CRP Square to Fire Station Square NH-16 Service Road Stretch,CRP-Fire Station stretch of the NH service road / Fire Station square,1,20.2804,85.7996,7MG77QJX+4VR,2026-07-03,3,6.0,True,False,728.0,617.0,False,,True
+LOC-42,Naka Gate & Padma Apartment Gali (Khandagiri-Ghatikia Rd),"Padma Apartment gali, Naka Gate",1,20.2711,85.7836,7MG77QCM+CCP,2018-10-12,1,3.0,True,False,2115.0,1360.0,False,,True
+WL13,City Women's College Area to Jagamara Stretch (Dharam Vihar),City Women's College area to Jagamara / Jagamara,2,20.2591,85.7918,7MG77Q5R+JPP,2024-06-29,4,3.0,True,False,730.0,1421.0,False,,True
+LOC-44,"Mallick Complex (Jagamara Road, Jagamara)",Mallick Complex,1,20.2581,85.7987,7MG77Q5X+6FX,2018-10-12,1,4.0,True,False,362.0,1051.0,False,,True
+LOC-45,"Jagmohan Nagar / Jagamohan Nagar (Jagamara, Khandagiri)",Jagmohan Nagar / Jagamohan Nagar,2,20.2495,85.7965,7MG76QXX+RM,2026-08-06,2,281.0,True,False,625.0,313.0,True,,True
+WL16,Ayurvedic Hospital near Kalinga Studio Square (Bharatpur-Sampur),Ayurvedic Hospital near Kalinga Studio square / Bharatpur and Sampur,1,20.2884,85.7786,7MG77QQH+9C4,2024-06-29,1,3.0,True,False,2503.0,2166.0,False,,True
+LOC-47,"Ward No. 23 / Kalinga Nagar (BDA Plotted Scheme, Ghatikia-Kalinga Nagar)",Ward No. 23 / Kalinga Nagar,3,20.2764,85.7646,7MG77QG7+5GF,2025-09-03,2,135.0,True,False,4104.0,3196.0,True,,True
+LOC-48,Rajiv Nagar in Aiginia (Khandagiri NH-16 Corridor),Rajiv Nagar in Aiginia,2,20.251,85.7824,7MG77Q2J+9WQ,2024-06-29,2,6.0,True,False,1626.0,962.0,False,,True
+LOC-49,Dumduma (Raghunath Nagar & Housing Board Colony),Dumduma,3,20.2367,85.7896,7MG76QPQ+MRP,2023-09-02,1,3.0,True,False,2191.0,1055.0,False,,True
+LOC-50,Patrapada NH-16 Flyover & Service Road Stretch,Patrapada / NH flyover near Jayadev Vihar and Patrapada,1,20.2365,85.7621,7MG76QP6+JR4,2026-07-03,2,3.0,True,False,4218.0,3116.0,False,,True
+LOC-51,"Tarini Basti in Kalinga Vihar (Tarini Chowk, Kalinga Vihar)",Tarini Basti in Kalinga Vihar,2,20.2354,85.761,7MG76QP6+59H,2026-08-16,1,4.0,True,False,4378.0,3266.0,False,,True
+LOC-52,Tamando (NH-16 / Tamando Road),Tamando,2,20.2368,85.7485,7MG76PPX+PCC,2026-08-16,1,2.0,False,False,5490.0,4468.0,False,outside city mask,False
+LOC-53,"Bagicha Colony in Salia Sahi Vihar (Janata Nagar, Salia Sahi)",Bagicha Colony area in Saliasahi Vihar,2,20.3011,85.8125,7MG78R27+C2C,2026-08-16,2,4.0,True,False,1010.0,579.0,False,,True
+LOC-54,Chandrasekharpur (Omfed Square / Nandankanan Rd Corridor),Chandrasekharpur,3,20.3203,85.8205,7MG78RCC+463,2026-08-16,1,6.0,True,False,2671.0,1189.0,False,,True
+LOC-55,Sailashree Vihar (Phase-VII / Fire Station Road Square),Sailashree Vihar,3,20.348,85.825,7MG78RXG+52J,2026-07-03,1,4.0,True,False,4946.0,1449.0,False,,True
+LOC-56,"Pragati Vihar (Rangeswar Nagar / Sishu Vihar, Patia)",Pragati Vihar,2,20.3431,85.823,7MG78RVF+65W,2022-08-10,1,5.0,True,False,4642.0,1530.0,False,,True
+WL14,Nandan Vihar & Banaphool Slum (Patia),Banaphool slum in Nandan Vihar / Nandan Vihar,2,20.3601,85.8343,7MG79R6M+3P4,2024-06-29,5,5.0,True,False,5716.0,824.0,False,,True
+LOC-58,Mancheswar Bhoi Sahi (Mancheswar),Mancheswar Bhoi Sahi,2,20.3231,85.8433,7MG78RFV+68W,2026-08-16,0,3.0,True,False,1592.0,526.0,False,,True
+LOC-59,VSS Nagar (Vani Vihar North),VSS Nagar,2,20.3022,85.8495,7MG78R2X+VRJ,2023-06-22,1,2.0,True,False,567.0,157.0,False,,True
+LOC-60,Satya Vihar NHAI Underpass (Rasulgarh-Pahala NH-16 Corridor),NHAI underpass near Satya Vihar,1,20.3045,85.869,7MG78V39+RJ,2026-08-16,1,10.0,True,False,1108.0,110.0,False,,True
+LOC-61,"Hansapal / Hanspal & Haridaspur (NH-16 / Puri Main Canal, Ward 4)","Hansapal, Haridaspur / Hanspal, Haridaspur",2,20.3165,85.8787,7MG78V8H+HFM,2022-08-10,2,5.0,True,False,2717.0,1307.0,False,,True
+LOC-62,Swapneswar Temple Area of Ward No. 4 (Haridaspur / Naharkanta),Swapneswar Temple area of ward no 4,1,20.3237,85.8742,7MG78VFF+FMH,2026-08-16,1,4.0,True,False,2717.0,1174.0,False,,True
+LOC-63,"Millennium City, Laxmi Residency, Baibhab Nagar & Rudrapur in Pahala (Ward No. 4)",Millennium City and Laxmi Residency in Pahala / Baibhab Nagar area of Ward no 4 / Rudrapur in Ward no 4,2,20.343,85.8835,7MG78VVM+5CV,2026-08-16,4,5.0,True,False,4832.0,671.0,False,,True
