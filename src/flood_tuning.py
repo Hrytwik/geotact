@@ -23,7 +23,7 @@ def percentile_map(train_scores):
     return f
 
 
-def nested_family(X, y, folds, factory, configs, refit_factory=None):
+def nested_family(X, y, folds, factory, configs, refit_factory=None, X_eval=None, folds_eval=None):
     """Nested search for one model family. `factory(params)` returns a fresh estimator (fit / predict_proba). Returns the outer
     out-of-fold score of every sample, the inner out-of-fold scores of each outer training set (for ensembling), the chosen
     parameters and every config's inner AUC."""
@@ -31,6 +31,7 @@ def nested_family(X, y, folds, factory, configs, refit_factory=None):
     X, y, folds = np.asarray(X), np.asarray(y), np.asarray(folds)
     refit_factory = refit_factory or factory
     outer = np.full(len(y), np.nan)
+    outer_eval = None if X_eval is None else np.full(len(X_eval), np.nan)
     inner_oof, chosen, inner_auc = [], [], []
     for k in np.unique(folds):
         tr = folds != k
@@ -43,7 +44,10 @@ def nested_family(X, y, folds, factory, configs, refit_factory=None):
         model = refit_factory(configs[best])
         model.fit(X[tr], y[tr])
         outer[~tr] = model.predict_proba(X[~tr])[:, 1]
-    return dict(outer=outer, inner_oof=inner_oof, chosen=chosen, inner_auc=inner_auc)
+        if outer_eval is not None:                        # also score a different sample set that lies in the same outer fold
+            te_e = np.asarray(folds_eval) == k
+            outer_eval[te_e] = model.predict_proba(np.asarray(X_eval)[te_e])[:, 1]
+    return dict(outer=outer, inner_oof=inner_oof, chosen=chosen, inner_auc=inner_auc, outer_eval=outer_eval)
 
 
 def soft_vote(results, folds):
@@ -53,6 +57,16 @@ def soft_vote(results, folds):
     for i, k in enumerate(np.unique(folds)):
         te = folds == k
         out[te] = np.mean([percentile_map(r["inner_oof"][i])(r["outer"][te]) for r in results.values()], axis=0)
+    return out
+
+
+def soft_vote_eval(results, folds_eval):
+    """soft_vote for the extra evaluation set scored by nested_family(X_eval=...): the same percentile mapping per outer fold."""
+    folds_eval = np.asarray(folds_eval)
+    out = np.full(len(folds_eval), np.nan)
+    for i, k in enumerate(np.unique(folds_eval)):
+        te = folds_eval == k
+        out[te] = np.mean([percentile_map(r["inner_oof"][i])(r["outer_eval"][te]) for r in results.values()], axis=0)
     return out
 
 
