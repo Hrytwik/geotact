@@ -1,0 +1,1606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="1">
+        <Style id="4">
+            <IconStyle id="5">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="6">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="11">
+            <LineStyle id="13">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="12">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="16">
+            <IconStyle id="17">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="18">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="23">
+            <LineStyle id="25">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="24">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="28">
+            <IconStyle id="29">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="30">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="35">
+            <LineStyle id="37">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="36">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="40">
+            <IconStyle id="41">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="42">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="47">
+            <LineStyle id="49">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="48">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="52">
+            <IconStyle id="53">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="54">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="59">
+            <LineStyle id="61">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="60">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="64">
+            <IconStyle id="65">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="66">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="71">
+            <LineStyle id="73">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="72">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="76">
+            <IconStyle id="77">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="78">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="83">
+            <LineStyle id="85">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="84">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="88">
+            <IconStyle id="89">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="90">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="95">
+            <LineStyle id="97">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="96">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="100">
+            <IconStyle id="101">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="102">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="107">
+            <LineStyle id="109">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="108">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="112">
+            <IconStyle id="113">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="114">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="119">
+            <LineStyle id="121">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="120">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="124">
+            <IconStyle id="125">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="126">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="131">
+            <LineStyle id="133">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="132">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="136">
+            <IconStyle id="137">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="138">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="143">
+            <LineStyle id="145">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="144">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="148">
+            <IconStyle id="149">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="150">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="155">
+            <LineStyle id="157">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="156">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="160">
+            <IconStyle id="161">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="162">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="167">
+            <LineStyle id="169">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="168">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="172">
+            <IconStyle id="173">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="174">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="179">
+            <LineStyle id="181">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="180">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="184">
+            <IconStyle id="185">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="186">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="191">
+            <LineStyle id="193">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="192">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="196">
+            <IconStyle id="197">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="198">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="203">
+            <LineStyle id="205">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="204">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="208">
+            <IconStyle id="209">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="210">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="215">
+            <LineStyle id="217">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="216">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="220">
+            <IconStyle id="221">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="222">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="227">
+            <LineStyle id="229">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="228">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="232">
+            <IconStyle id="233">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="234">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="239">
+            <LineStyle id="241">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="240">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="244">
+            <IconStyle id="245">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="246">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="251">
+            <LineStyle id="253">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="252">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="256">
+            <IconStyle id="257">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="258">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="263">
+            <LineStyle id="265">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="264">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="268">
+            <IconStyle id="269">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="270">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="275">
+            <LineStyle id="277">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="276">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="280">
+            <IconStyle id="281">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="282">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="287">
+            <LineStyle id="289">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="288">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="292">
+            <IconStyle id="293">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="294">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="299">
+            <LineStyle id="301">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="300">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="304">
+            <IconStyle id="305">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="306">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="311">
+            <LineStyle id="313">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="312">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="316">
+            <IconStyle id="317">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="318">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="323">
+            <LineStyle id="325">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="324">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="328">
+            <IconStyle id="329">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="330">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="335">
+            <LineStyle id="337">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="336">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="340">
+            <IconStyle id="341">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="342">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="347">
+            <LineStyle id="349">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="348">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="352">
+            <IconStyle id="353">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="354">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="359">
+            <LineStyle id="361">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="360">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="364">
+            <IconStyle id="365">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="366">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="371">
+            <LineStyle id="373">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="372">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="376">
+            <IconStyle id="377">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="378">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="383">
+            <LineStyle id="385">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="384">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="388">
+            <IconStyle id="389">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="390">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="395">
+            <LineStyle id="397">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="396">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="400">
+            <IconStyle id="401">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="402">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="407">
+            <LineStyle id="409">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="408">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="412">
+            <IconStyle id="413">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="414">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="419">
+            <LineStyle id="421">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="420">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="424">
+            <IconStyle id="425">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="426">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="431">
+            <LineStyle id="433">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="432">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="436">
+            <IconStyle id="437">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="438">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="443">
+            <LineStyle id="445">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="444">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="448">
+            <IconStyle id="449">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="450">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="455">
+            <LineStyle id="457">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="456">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="460">
+            <IconStyle id="461">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="462">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="467">
+            <LineStyle id="469">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="468">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Style id="472">
+            <IconStyle id="473">
+                <colorMode>normal</colorMode>
+                <scale>0.6</scale>
+                <heading>0</heading>
+                <Icon id="474">
+                    <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="479">
+            <LineStyle id="481">
+                <color>ff00ffff</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="480">
+                <colorMode>normal</colorMode>
+                <fill>0</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <name>Bhubaneswar tree-loss check points</name>
+        <Placemark id="3">
+            <name>T01</name>
+            <styleUrl>#4</styleUrl>
+            <Point id="2">
+                <coordinates>85.796821,20.313258,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="8">
+            <name>T01 pixel</name>
+            <styleUrl>#11</styleUrl>
+            <Polygon id="7">
+                <outerBoundaryIs>
+                    <LinearRing id="9">
+                        <coordinates>85.79677367369344,20.313212778737693,0.0 85.79686944086677,20.313213437440403,0.0 85.79686874264657,20.313303781086862,0.0 85.79677297541768,20.31330312238097,0.0 85.79677367369344,20.313212778737693,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="15">
+            <name>T02</name>
+            <styleUrl>#16</styleUrl>
+            <Point id="14">
+                <coordinates>85.801633,20.297751,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="20">
+            <name>T02 pixel</name>
+            <styleUrl>#23</styleUrl>
+            <Polygon id="19">
+                <outerBoundaryIs>
+                    <LinearRing id="21">
+                        <coordinates>85.80158584884961,20.29770584593694,0.0 85.80168160665879,20.297706501526974,0.0 85.8016809118085,20.297796845493213,0.0 85.80158515394383,20.2977961899,0.0 85.80158584884961,20.29770584593694,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="27">
+            <name>T03</name>
+            <styleUrl>#28</styleUrl>
+            <Point id="26">
+                <coordinates>85.787347,20.26314,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="32">
+            <name>T03 pixel</name>
+            <styleUrl>#35</styleUrl>
+            <Polygon id="31">
+                <outerBoundaryIs>
+                    <LinearRing id="33">
+                        <coordinates>85.78729910305609,20.263094308802035,0.0 85.7873948391132,20.26309497112577,0.0 85.78739413728417,20.263185314972052,0.0 85.78729840117167,20.263184652645112,0.0 85.78729910305609,20.263094308802035,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="39">
+            <name>T04</name>
+            <styleUrl>#40</styleUrl>
+            <Point id="38">
+                <coordinates>85.805219,20.354605,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="44">
+            <name>T04 pixel</name>
+            <styleUrl>#47</styleUrl>
+            <Polygon id="43">
+                <outerBoundaryIs>
+                    <LinearRing id="45">
+                        <coordinates>85.80517130820006,20.354559583355,0.0 85.80526710113217,20.354560238732805,0.0 85.80526640624855,20.354650582230967,0.0 85.80517061326077,20.354649926849998,0.0 85.80517130820006,20.354559583355,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="51">
+            <name>T05</name>
+            <styleUrl>#52</styleUrl>
+            <Point id="50">
+                <coordinates>85.817498,20.25142,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="56">
+            <name>T05 pixel</name>
+            <styleUrl>#59</styleUrl>
+            <Polygon id="55">
+                <outerBoundaryIs>
+                    <LinearRing id="57">
+                        <coordinates>85.81745073148237,20.25137418341906,0.0 85.81754646141351,20.251374828919975,0.0 85.81754577746364,20.251465173885908,0.0 85.81745004747717,20.251464528381863,0.0 85.81745073148237,20.25137418341906,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="63">
+            <name>T06</name>
+            <styleUrl>#64</styleUrl>
+            <Point id="62">
+                <coordinates>85.857897,20.30391,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="68">
+            <name>T06 pixel</name>
+            <styleUrl>#71</styleUrl>
+            <Polygon id="67">
+                <outerBoundaryIs>
+                    <LinearRing id="69">
+                        <coordinates>85.85784968798419,20.303864424819754,0.0 85.85794545150952,20.30386504981479,0.0 85.8579447890611,20.303955395539166,0.0 85.85784902548023,20.303954770541107,0.0 85.85784968798419,20.303864424819754,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="75">
+            <name>T07</name>
+            <styleUrl>#76</styleUrl>
+            <Point id="74">
+                <coordinates>85.826408,20.33957,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="80">
+            <name>T07 pixel</name>
+            <styleUrl>#83</styleUrl>
+            <Polygon id="79">
+                <outerBoundaryIs>
+                    <LinearRing id="81">
+                        <coordinates>85.82636048261635,20.33952466481069,0.0 85.8264562670179,20.33952530811288,0.0 85.82645558500546,20.339615652460555,0.0 85.82635980054827,20.33961500915526,0.0 85.82636048261635,20.33952466481069,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="87">
+            <name>T08</name>
+            <styleUrl>#88</styleUrl>
+            <Point id="86">
+                <coordinates>85.807729,20.314598,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="92">
+            <name>T08 pixel</name>
+            <styleUrl>#95</styleUrl>
+            <Polygon id="91">
+                <outerBoundaryIs>
+                    <LinearRing id="93">
+                        <coordinates>85.80768146820584,20.314552349299895,0.0 85.80777723658633,20.314553002072905,0.0 85.80777654464576,20.314643346067,0.0 85.80768077620972,20.31464269329084,0.0 85.80768146820584,20.314552349299895,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="99">
+            <name>T09</name>
+            <styleUrl>#100</styleUrl>
+            <Point id="98">
+                <coordinates>85.787429,20.30181,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="104">
+            <name>T09 pixel</name>
+            <styleUrl>#107</styleUrl>
+            <Polygon id="103">
+                <outerBoundaryIs>
+                    <LinearRing id="105">
+                        <coordinates>85.78738138739904,20.301764040926475,0.0 85.78747714720016,20.30176470441294,0.0 85.78747644396162,20.30185504786359,0.0 85.78738068410497,20.301854384373925,0.0 85.78738138739904,20.301764040926475,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="111">
+            <name>T10</name>
+            <styleUrl>#112</styleUrl>
+            <Point id="110">
+                <coordinates>85.884279,20.33769,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="116">
+            <name>T10 pixel</name>
+            <styleUrl>#119</styleUrl>
+            <Polygon id="115">
+                <outerBoundaryIs>
+                    <LinearRing id="117">
+                        <coordinates>85.88423113321524,20.337645007940598,0.0 85.88432691840197,20.337645619471143,0.0 85.88432627008234,20.337735965670927,0.0 85.88423048483997,20.337735354137433,0.0 85.88423113321524,20.337645007940598,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="123">
+            <name>T11</name>
+            <styleUrl>#124</styleUrl>
+            <Point id="122">
+                <coordinates>85.830695,20.278974,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="128">
+            <name>T11 pixel</name>
+            <styleUrl>#131</styleUrl>
+            <Polygon id="127">
+                <outerBoundaryIs>
+                    <LinearRing id="129">
+                        <coordinates>85.83064720639065,20.27892900247246,0.0 85.83074295367655,20.278929641600648,0.0 85.83074227635764,20.279019986712225,0.0 85.83064652901632,20.279019347580945,0.0 85.83064720639065,20.27892900247246,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="135">
+            <name>T12</name>
+            <styleUrl>#136</styleUrl>
+            <Point id="134">
+                <coordinates>85.828309,20.303353,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="140">
+            <name>T12 pixel</name>
+            <styleUrl>#143</styleUrl>
+            <Polygon id="139">
+                <outerBoundaryIs>
+                    <LinearRing id="141">
+                        <coordinates>85.8282616507673,20.30330741355723,0.0 85.82835741294635,20.303308054724788,0.0 85.828356733358,20.303398399507863,0.0 85.82826097112344,20.303397758337212,0.0 85.8282616507673,20.30330741355723,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="147">
+            <name>T13</name>
+            <styleUrl>#148</styleUrl>
+            <Point id="146">
+                <coordinates>85.793064,20.254235,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="152">
+            <name>T13 pixel</name>
+            <styleUrl>#155</styleUrl>
+            <Polygon id="151">
+                <outerBoundaryIs>
+                    <LinearRing id="153">
+                        <coordinates>85.7930166812635,20.254189232622316,0.0 85.793112412064,20.254189891546837,0.0 85.7931117138776,20.254280235676145,0.0 85.79301598302173,20.254279576748434,0.0 85.7930166812635,20.254189232622316,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="159">
+            <name>T14</name>
+            <styleUrl>#160</styleUrl>
+            <Point id="158">
+                <coordinates>85.777653,20.278341,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="164">
+            <name>T14 pixel</name>
+            <styleUrl>#167</styleUrl>
+            <Polygon id="163">
+                <outerBoundaryIs>
+                    <LinearRing id="165">
+                        <coordinates>85.77760590778632,20.278295854063636,0.0 85.77770165282372,20.2782965221594,0.0 85.77770094480796,20.27838686552264,0.0 85.77760519971514,20.27838619742364,0.0 85.77760590778632,20.278295854063636,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="171">
+            <name>T15</name>
+            <styleUrl>#172</styleUrl>
+            <Point id="170">
+                <coordinates>85.796465,20.334488,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="176">
+            <name>T15 pixel</name>
+            <styleUrl>#179</styleUrl>
+            <Polygon id="175">
+                <outerBoundaryIs>
+                    <LinearRing id="177">
+                        <coordinates>85.79641791435145,20.334442189580034,0.0 85.79651369457846,20.334442849135357,0.0 85.7965129953574,20.334533192550897,0.0 85.7964172150748,20.334532532992394,0.0 85.79641791435145,20.334442189580034,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="183">
+            <name>T16</name>
+            <styleUrl>#184</styleUrl>
+            <Point id="182">
+                <coordinates>85.758423,20.24035,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="188">
+            <name>T16 pixel</name>
+            <styleUrl>#191</styleUrl>
+            <Polygon id="187">
+                <outerBoundaryIs>
+                    <LinearRing id="189">
+                        <coordinates>85.75837507697713,20.24030479545323,0.0 85.75847079802811,20.240305472843318,0.0 85.75847008033998,20.240395815942094,0.0 85.75837435923368,20.24039513854872,0.0 85.75837507697713,20.24030479545323,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="195">
+            <name>T17</name>
+            <styleUrl>#196</styleUrl>
+            <Point id="194">
+                <coordinates>85.763862,20.30291,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="200">
+            <name>T17 pixel</name>
+            <styleUrl>#203</styleUrl>
+            <Polygon id="199">
+                <outerBoundaryIs>
+                    <LinearRing id="201">
+                        <coordinates>85.76381455529125,20.302864029291634,0.0 85.76391031492231,20.302864705706302,0.0 85.76390959797529,20.30295504834732,0.0 85.76381383828871,20.302954371929385,0.0 85.76381455529125,20.302864029291634,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="207">
+            <name>T18</name>
+            <styleUrl>#208</styleUrl>
+            <Point id="206">
+                <coordinates>85.825756,20.298999,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="212">
+            <name>T18 pixel</name>
+            <styleUrl>#215</styleUrl>
+            <Polygon id="211">
+                <outerBoundaryIs>
+                    <LinearRing id="213">
+                        <coordinates>85.82570876383534,20.29895353569403,0.0 85.8258045232505,20.298954178126717,0.0 85.8258038423405,20.299044522871835,0.0 85.82570808286985,20.299043880436045,0.0 85.82570876383534,20.29895353569403,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="219">
+            <name>T19</name>
+            <styleUrl>#220</styleUrl>
+            <Point id="218">
+                <coordinates>85.775544,20.278688,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="224">
+            <name>T19 pixel</name>
+            <styleUrl>#227</styleUrl>
+            <Polygon id="223">
+                <outerBoundaryIs>
+                    <LinearRing id="225">
+                        <coordinates>85.77549668075076,20.27864251587402,0.0 85.77559242592527,20.278643185133383,0.0 85.77559171667474,20.27873352842165,0.0 85.7754959714448,20.27873285915905,0.0 85.77549668075076,20.27864251587402,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="231">
+            <name>T20</name>
+            <styleUrl>#232</styleUrl>
+            <Point id="230">
+                <coordinates>85.792311,20.302114,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="236">
+            <name>T20 pixel</name>
+            <styleUrl>#239</styleUrl>
+            <Polygon id="235">
+                <outerBoundaryIs>
+                    <LinearRing id="237">
+                        <coordinates>85.79226304071058,20.30206884279456,0.0 85.7923588008723,20.302069503619784,0.0 85.79235810045316,20.302159847230744,0.0 85.79226234023592,20.302159186402324,0.0 85.79226304071058,20.30206884279456,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="243">
+            <name>T21</name>
+            <styleUrl>#244</styleUrl>
+            <Point id="242">
+                <coordinates>85.800673,20.298106,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="248">
+            <name>T21 pixel</name>
+            <styleUrl>#251</styleUrl>
+            <Polygon id="247">
+                <outerBoundaryIs>
+                    <LinearRing id="249">
+                        <coordinates>85.80062548909976,20.298060662876573,0.0 85.80072124709321,20.29806131900288,0.0 85.80072055167291,20.298151662933602,0.0 85.80062479362397,20.298151006804126,0.0 85.80062548909976,20.298060662876573,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="255">
+            <name>T22</name>
+            <styleUrl>#256</styleUrl>
+            <Point id="254">
+                <coordinates>85.782997,20.280728,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="260">
+            <name>T22 pixel</name>
+            <styleUrl>#263</styleUrl>
+            <Polygon id="259">
+                <outerBoundaryIs>
+                    <LinearRing id="261">
+                        <coordinates>85.78294930539597,20.28068211862499,0.0 85.78304505208924,20.280682783875456,0.0 85.78304434707793,20.280773127394422,0.0 85.78294860032923,20.280772462140742,0.0 85.78294930539597,20.28068211862499,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="267">
+            <name>T23</name>
+            <styleUrl>#268</styleUrl>
+            <Point id="266">
+                <coordinates>85.776693,20.278696,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="272">
+            <name>T23 pixel</name>
+            <styleUrl>#275</styleUrl>
+            <Polygon id="271">
+                <outerBoundaryIs>
+                    <LinearRing id="273">
+                        <coordinates>85.77664562309884,20.278650543534344,0.0 85.77674136831952,20.278651212166068,0.0 85.7767406597341,20.27874155549316,0.0 85.77664491445802,20.278740886858202,0.0 85.77664562309884,20.278650543534344,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="279">
+            <name>T24</name>
+            <styleUrl>#280</styleUrl>
+            <Point id="278">
+                <coordinates>85.874537,20.30718,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="284">
+            <name>T24 pixel</name>
+            <styleUrl>#287</styleUrl>
+            <Polygon id="283">
+                <outerBoundaryIs>
+                    <LinearRing id="285">
+                        <coordinates>85.8744897435581,20.307134503520153,0.0 85.87458550964722,20.307135119505155,0.0 85.87458485673523,20.307225465717778,0.0 85.87448909059057,20.307224849729803,0.0 85.8744897435581,20.307134503520153,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="291">
+            <name>T25</name>
+            <styleUrl>#292</styleUrl>
+            <Point id="290">
+                <coordinates>85.835753,20.319665,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="296">
+            <name>T25 pixel</name>
+            <styleUrl>#299</styleUrl>
+            <Polygon id="295">
+                <outerBoundaryIs>
+                    <LinearRing id="297">
+                        <coordinates>85.83570526876994,20.31961999336834,0.0 85.83580104123666,20.319620630952233,0.0 85.83580036537485,20.319710975807585,0.0 85.83570459285255,20.319710338220613,0.0 85.83570526876994,20.31961999336834,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="303">
+            <name>T26</name>
+            <styleUrl>#304</styleUrl>
+            <Point id="302">
+                <coordinates>85.803054,20.349621,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="308">
+            <name>T26 pixel</name>
+            <styleUrl>#311</styleUrl>
+            <Polygon id="307">
+                <outerBoundaryIs>
+                    <LinearRing id="309">
+                        <coordinates>85.80300635809724,20.349575605473444,0.0 85.80310214788067,20.34957626188505,0.0 85.80310145192358,20.349666605363076,0.0 85.8030056620845,20.349665948948306,0.0 85.80300635809724,20.349575605473444,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="315">
+            <name>T27</name>
+            <styleUrl>#316</styleUrl>
+            <Point id="314">
+                <coordinates>85.838472,20.263215,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="320">
+            <name>T27 pixel</name>
+            <styleUrl>#323</styleUrl>
+            <Polygon id="319">
+                <outerBoundaryIs>
+                    <LinearRing id="321">
+                        <coordinates>85.83842470907047,20.263169515650933,0.0 85.83852044695313,20.26317015005711,0.0 85.83851977470768,20.263260495581754,0.0 85.83842403676964,20.2632598611725,0.0 85.83842470907047,20.263169515650933,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="327">
+            <name>T28</name>
+            <styleUrl>#328</styleUrl>
+            <Point id="326">
+                <coordinates>85.803238,20.350616,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="332">
+            <name>T28 pixel</name>
+            <styleUrl>#335</styleUrl>
+            <Polygon id="331">
+                <outerBoundaryIs>
+                    <LinearRing id="333">
+                        <coordinates>85.80319028254515,20.350570696484674,0.0 85.80328607294845,20.35057135282609,0.0 85.80328537706126,20.350661696299927,0.0 85.80318958660229,20.35066103995534,0.0 85.80319028254515,20.350570696484674,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="339">
+            <name>T29</name>
+            <styleUrl>#340</styleUrl>
+            <Point id="338">
+                <coordinates>85.763678,20.302005,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="344">
+            <name>T29 pixel</name>
+            <styleUrl>#347</styleUrl>
+            <Polygon id="343">
+                <outerBoundaryIs>
+                    <LinearRing id="345">
+                        <coordinates>85.76363020696247,20.301959249940527,0.0 85.7637259660307,20.301959926427248,0.0 85.76372524901153,20.302050269071287,0.0 85.76362948988779,20.302049592581294,0.0 85.76363020696247,20.301959249940527,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="351">
+            <name>T30</name>
+            <styleUrl>#352</styleUrl>
+            <Point id="350">
+                <coordinates>85.804652,20.353607,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="356">
+            <name>T30 pixel</name>
+            <styleUrl>#359</styleUrl>
+            <Polygon id="355">
+                <outerBoundaryIs>
+                    <LinearRing id="357">
+                        <coordinates>85.8046041984454,20.353561871685745,0.0 85.80469999074245,20.353562527343886,0.0 85.80469929556614,20.353652870833603,0.0 85.80460350321341,20.353652215172307,0.0 85.8046041984454,20.353561871685745,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="363">
+            <name>T31</name>
+            <styleUrl>#364</styleUrl>
+            <Point id="362">
+                <coordinates>85.76202,20.245435,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="368">
+            <name>T31 pixel</name>
+            <styleUrl>#371</styleUrl>
+            <Polygon id="367">
+                <outerBoundaryIs>
+                    <LinearRing id="369">
+                        <coordinates>85.76197239770934,20.24538971843519,0.0 85.76206812200547,20.245390394025097,0.0 85.762067406201,20.24548073719496,0.0 85.76197168184954,20.245480061601782,0.0 85.76197239770934,20.24538971843519,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="375">
+            <name>T32</name>
+            <styleUrl>#376</styleUrl>
+            <Point id="374">
+                <coordinates>85.880345,20.312006,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="380">
+            <name>T32 pixel</name>
+            <styleUrl>#383</styleUrl>
+            <Polygon id="379">
+                <outerBoundaryIs>
+                    <LinearRing id="381">
+                        <coordinates>85.88029704886009,20.31196034012697,0.0 85.88039281810812,20.311960953073072,0.0 85.88039216839685,20.312051299416282,0.0 85.88029639909325,20.31205068646722,0.0 85.88029704886009,20.31196034012697,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="387">
+            <name>T33</name>
+            <styleUrl>#388</styleUrl>
+            <Point id="386">
+                <coordinates>85.785607,20.289781,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="392">
+            <name>T33 pixel</name>
+            <styleUrl>#395</styleUrl>
+            <Polygon id="391">
+                <outerBoundaryIs>
+                    <LinearRing id="393">
+                        <coordinates>85.78555984390209,20.289735081713687,0.0 85.78565559624738,20.289735745820504,0.0 85.78565489240654,20.289826089334,0.0 85.7855591400058,20.28982542522397,0.0 85.78555984390209,20.289735081713687,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="399">
+            <name>T34</name>
+            <styleUrl>#400</styleUrl>
+            <Point id="398">
+                <coordinates>85.86367,20.339545,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="404">
+            <name>T34 pixel</name>
+            <styleUrl>#407</styleUrl>
+            <Polygon id="403">
+                <outerBoundaryIs>
+                    <LinearRing id="405">
+                        <coordinates>85.86362287188823,20.339499912416283,0.0 85.86371865753696,20.339500535295116,0.0 85.86371799717783,20.339590880833725,0.0 85.86362221147347,20.33959025795189,0.0 85.86362287188823,20.339499912416283,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="411">
+            <name>T35</name>
+            <styleUrl>#412</styleUrl>
+            <Point id="410">
+                <coordinates>85.807406,20.306735,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="416">
+            <name>T35 pixel</name>
+            <styleUrl>#419</styleUrl>
+            <Polygon id="415">
+                <outerBoundaryIs>
+                    <LinearRing id="417">
+                        <coordinates>85.80735860335493,20.306689807914477,0.0 85.80745436688873,20.306690460622775,0.0 85.8074536750523,20.306780804687314,0.0 85.80735791146297,20.306780151975858,0.0 85.80735860335493,20.306689807914477,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="423">
+            <name>T36</name>
+            <styleUrl>#424</styleUrl>
+            <Point id="422">
+                <coordinates>85.829164,20.304262,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="428">
+            <name>T36 pixel</name>
+            <styleUrl>#431</styleUrl>
+            <Polygon id="427">
+                <outerBoundaryIs>
+                    <LinearRing id="429">
+                        <coordinates>85.82911671890331,20.304216630215294,0.0 85.82921248167068,20.304217270942424,0.0 85.82921180254513,20.304307615743834,0.0 85.82911603972227,20.30430697501361,0.0 85.82911671890331,20.304216630215294,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="435">
+            <name>T37</name>
+            <styleUrl>#436</styleUrl>
+            <Point id="434">
+                <coordinates>85.807727,20.352364,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="440">
+            <name>T37 pixel</name>
+            <styleUrl>#443</styleUrl>
+            <Polygon id="439">
+                <outerBoundaryIs>
+                    <LinearRing id="441">
+                        <coordinates>85.80767926172511,20.352318016371843,0.0 85.80777505336295,20.352318670305348,0.0 85.80777436002093,20.352409013909483,0.0 85.8076785683274,20.35240835997282,0.0 85.80767926172511,20.352318016371843,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="447">
+            <name>T38</name>
+            <styleUrl>#448</styleUrl>
+            <Point id="446">
+                <coordinates>85.803688,20.354324,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="452">
+            <name>T38 pixel</name>
+            <styleUrl>#455</styleUrl>
+            <Polygon id="451">
+                <outerBoundaryIs>
+                    <LinearRing id="453">
+                        <coordinates>85.8036407092662,20.354278059828708,0.0 85.80373650197104,20.354278716037303,0.0 85.80373580620781,20.35436905948775,0.0 85.80364001344728,20.35436840327599,0.0 85.8036407092662,20.354278059828708,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="459">
+            <name>T39</name>
+            <styleUrl>#460</styleUrl>
+            <Point id="458">
+                <coordinates>85.80626,20.306276,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="464">
+            <name>T39 pixel</name>
+            <styleUrl>#467</styleUrl>
+            <Polygon id="463">
+                <outerBoundaryIs>
+                    <LinearRing id="465">
+                        <coordinates>85.80621290397671,20.30623025119695,0.0 85.80630866718789,20.306230904518078,0.0 85.80630797470394,20.30632124854953,0.0 85.80621221143724,20.306320595225248,0.0 85.80621290397671,20.30623025119695,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+        <Placemark id="471">
+            <name>T40</name>
+            <styleUrl>#472</styleUrl>
+            <Point id="470">
+                <coordinates>85.865073,20.318051,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="476">
+            <name>T40 pixel</name>
+            <styleUrl>#479</styleUrl>
+            <Polygon id="475">
+                <outerBoundaryIs>
+                    <LinearRing id="477">
+                        <coordinates>85.8650249905814,20.318005731864922,0.0 85.86512076304344,20.318006353347183,0.0 85.86512010425757,20.318096699151713,0.0 85.86502433173997,20.318096077666446,0.0 85.8650249905814,20.318005731864922,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+    </Document>
+</kml>
