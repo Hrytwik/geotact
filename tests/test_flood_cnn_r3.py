@@ -71,3 +71,25 @@ def test_one_shot_guard_refuses_a_second_run(tmp_path):
     f.write_text(json.dumps({"done": True}))
     with pytest.raises(FileExistsError):
         r3.guard_one_shot(f)
+
+
+def test_second_look_doubles_p_and_reports_both_references():
+    ref, rand, pts = _toy_world(2)
+    built = rand > 0.3
+    informed = rand.copy()
+    for p in pts:
+        informed[p[0][0] - 2:p[0][0] + 3, p[0][1] - 2:p[0][1] + 3] += 5.0
+    res = r3.second_look_stats(informed, ref, built, pts, radius_cells=3.0, n_perm=300)
+    assert set(res) == {"all_city", "built_up_only"}
+    for r in res.values():
+        assert r["p_second_look"] == pytest.approx(min(1.0, 2 * r["p"]))
+        assert {"mean_percentile", "p", "ci95", "null_mean", "pass"} <= set(r)
+    assert res["all_city"]["pass"]
+
+
+def test_second_look_built_up_reference_excludes_cells_that_are_not_built_up():
+    ref, rand, pts = _toy_world(3)
+    built = np.zeros_like(ref); built[:30] = True                                       # only the upper half is built-up
+    res = r3.second_look_stats(rand, ref, built, pts, radius_cells=3.0, n_perm=100)
+    assert res["built_up_only"]["n_reference_cells"] == int((ref & built).sum())
+    assert res["all_city"]["n_reference_cells"] == int(ref.sum())

@@ -56,6 +56,41 @@ def test_scores(score_maps, ref, points_by_hotspot, radius_cells, n_perm=5000, s
     return res
 
 
+def second_look_stats(score_map, ref, builtup, points_by_hotspot, radius_cells, n_perm=5000, seed=0):
+    """One model, two references (all non-water city cells as in T6e; built-up cells only). p is also doubled for the second look at
+    the same hotspots."""
+    ref, builtup = np.asarray(ref, bool), np.asarray(builtup, bool)
+    out = {}
+    for name, refm in (("all_city", ref), ("built_up_only", ref & builtup)):
+        r = test_scores({"model": score_map}, refm, points_by_hotspot, radius_cells, n_perm, seed)["model"]
+        r["n_reference_cells"] = int((refm & np.isfinite(score_map)).sum())
+        r["p_second_look"] = float(min(1.0, 2 * r["p"]))
+        out[name] = r
+    return out
+
+
+RESULT_SECOND = OUT / "r3_urban_second_look.json"
+
+
+def run_second_look(n_perm=5000, seed=0):
+    from src import terrain as tr
+    guard_one_shot(RESULT_SECOND)
+    d = tr.real_inputs()
+    ref = d["bmc"] & ~d["water"]
+    score = np.load(OUT / "r3_scores_urban_logistic.npy")
+    builtup = np.load(OUT / "r3_builtup_mask.npy")
+    h = fh.load_hotspot_cells()
+    res = second_look_stats(score, ref, builtup, h["points_by_hotspot"], fh.RADIUS_M / abs(h["transform"].a), n_perm, seed)
+    for k, r in res.items():
+        print(f"{k:14s} mean percentile {r['mean_percentile']:5.1f} [{r['ci95'][0]:5.1f}, {r['ci95'][1]:5.1f}]  null {r['null_mean']:5.1f}  "
+              f"p {r['p']:.4f}  p (second look, doubled) {r['p_second_look']:.4f}  top20% {int(round(r['share_top20pct'] * 16))}/16  "
+              f"{'PASS' if (r['mean_percentile'] >= fh.PASS_MEAN_PERCENTILE and r['p_second_look'] < fh.PASS_P) else 'fail'}", flush=True)
+    RESULT_SECOND.write_text(json.dumps(dict(model="U logistic (51 urban cells vs built-up negatives)", n_perm=n_perm, seed=seed,
+                                             criterion=f"mean percentile >= {fh.PASS_MEAN_PERCENTILE} and doubled p < {fh.PASS_P}",
+                                             hotspots=h["names"], results=res), indent=1))
+    return res
+
+
 def guard_one_shot(path=RESULT):
     if Path(path).exists():
         raise FileExistsError(f"{path} exists: the hotspot test is one-shot and has already been run")
@@ -86,4 +121,5 @@ def run(n_perm=5000, seed=0):
 
 
 if __name__ == "__main__":
-    run()
+    import sys
+    run_second_look() if "--second-look" in sys.argv else run()

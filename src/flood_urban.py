@@ -189,9 +189,47 @@ def sensitivity(chosen_main=None, n_boot=500):
     (OUTPUTS / "flood_cnn" / "urban_sensitivity.json").write_text(json.dumps({f"{k[0]}|{k[1]}": v for k, v in res.items()}, indent=1))
 
 
+def choose_c(X, y, folds, grid=(0.01, 0.1, 1.0, 10.0)):
+    """Logistic C with the best pooled out-of-fold AUC under spatial CV on the given samples; returns (C, {C: AUC})."""
+    from sklearn.metrics import roc_auc_score
+
+    from src import flood_cnn_baselines as bl
+    table = {c: float(roc_auc_score(y, bl.cv_scores(X, y, folds, bl.logistic_factory(c)))) for c in grid}
+    return max(table, key=table.get), table
+
+
+def fit_final_and_score():
+    """T6j stage 1 for the hotspot second look: the U-logistic model refitted on ALL urban cells against all built-up negatives,
+    scored on every non-water city cell. Saves the score map and the built-up mask. Never reads the hotspots."""
+    from src import flood_cnn_baselines as bl
+    from src import flood_cnn_data as fd
+    from src import flood_cnn_r3 as r3
+    from src import terrain as tr
+    from src.config import OUTPUTS
+    smp, X, names, urban = build(False)
+    m, y = regime("U", smp["kind"], smp["builtup"])
+    c, table = choose_c(X[m], y[m], smp["fold"][m])
+    print(f"C by 5-fold spatial CV on all {int(y[m].sum())} urban cells: {c}   (pooled AUC by C: { {k: round(v, 3) for k, v in table.items()} })", flush=True)
+    model = bl.logistic_factory(c)()
+    model.fit(X[m], y[m])
+    d = fd.build(0)
+    stack, bi = d["stack"], fd.CHANNELS.index("share_built")
+    inp = tr.real_inputs()
+    ref = inp["bmc"] & ~inp["water"]
+    means = bl.local_means(stack)
+    centre = np.asarray(stack, dtype="float32")
+    score = r3.score_map(ref, lambda r, cc: model.predict_proba(np.hstack([centre[:, r, cc].T, means[:, r, cc].T]))[:, 1])
+    builtup = np.nan_to_num(stack[bi], nan=0.0) >= BUILTUP_MIN
+    out = OUTPUTS / "flood_cnn"
+    np.save(out / "r3_scores_urban_logistic.npy", score)
+    np.save(out / "r3_builtup_mask.npy", builtup)
+    print(f"scored {int(np.isfinite(score).sum())} city cells, range {np.nanmin(score):.4f}-{np.nanmax(score):.4f}; built-up cells in the reference: "
+          f"{int((ref & builtup).sum())} of {int(ref.sum())}", flush=True)
+
+
 if __name__ == "__main__":
     import sys
 
     from src.wardmap import memory_guard
     memory_guard(3.0)
-    sensitivity() if "--sensitivity" in sys.argv else run()
+    fit_final_and_score() if "--final" in sys.argv else sensitivity() if "--sensitivity" in sys.argv else run()

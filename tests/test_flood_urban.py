@@ -116,3 +116,15 @@ def test_soft_vote_eval_ignores_each_models_scale():
     v1 = tu.soft_vote_eval({"a": a, "b": b}, folds)
     big = dict(b, outer_eval=b["outer_eval"] * 1000 + 3, inner_oof=[o * 1000 + 3 for o in b["inner_oof"]])
     assert np.allclose(v1, tu.soft_vote_eval({"a": a, "b": big}, folds), atol=1e-9)
+
+
+def test_choose_c_picks_the_grid_value_with_the_best_pooled_spatial_cv_auc():
+    rng = np.random.default_rng(0)
+    n = 600
+    y = (rng.random(n) < 0.2).astype(int)
+    X = rng.normal(size=(n, 6)); X[:, 0] += 1.5 * y
+    folds = np.arange(n) % 5
+    c, table = ur.choose_c(X, y, folds, (0.01, 0.1, 1.0, 10.0))
+    assert c in (0.01, 0.1, 1.0, 10.0) and set(table) == {0.01, 0.1, 1.0, 10.0}
+    assert table[c] == max(table.values())
+    assert ur.choose_c(X, y, folds, (0.01, 0.1, 1.0, 10.0))[0] == c                   # deterministic
