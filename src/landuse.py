@@ -52,12 +52,32 @@ def labels_from(io, wc, mode="esri"):
     raise ValueError(f"unknown label mode {mode!r}")
 
 
-def load_inputs(composite="s2_2023", io_year=2023, labels="esri"):
-    """X: (10, H, W) reflectance (NaN = no data); Y: (H, W) uint8 chapter classes (IGNORE = unusable)."""
+def stats_path(tag, extra="none"):
+    """Band statistics file: the 10-band runs share band_stats.npz; runs with extra input channels keep their own."""
+    return OUT / ("band_stats.npz" if extra == "none" else f"band_stats_{tag}.npz")
+
+
+def ndvi_seasons():
+    import rasterio
+    with rasterio.open(OUTPUTS / "vegetation" / "ndvi_norm_stack.tif") as r:
+        return r.read().astype("float32")
+
+
+def add_extra(X, extra="none"):
+    if extra == "none":
+        return X
+    if extra == "ndvi":
+        from src.landuse_improve import stack_inputs
+        return stack_inputs(X, ndvi_seasons())
+    raise ValueError(f"unknown extra inputs {extra!r}")
+
+
+def load_inputs(composite="s2_2023", io_year=2023, labels="esri", extra="none"):
+    """X: (10, H, W) reflectance (NaN = no data), plus extra channels if asked; Y: (H, W) uint8 chapter classes (IGNORE = unusable)."""
     X = grid.read_aligned(RAW / f"{composite}.tif") / 10000.0
     io = grid.read_aligned(RAW / f"io_lulc_{io_year}.tif", resampling="nearest", dtype="uint8")
     wc = grid.read_aligned(RAW / "worldcover_2021.tif", resampling="nearest", dtype="uint8") if labels == "consensus" else None
-    return dict(X=X.astype("float32"), Y=labels_from(io, wc, labels))
+    return dict(X=add_extra(X.astype("float32"), extra), Y=labels_from(io, wc, labels))
 
 
 # ---------------------------------------------------------------- spatial split
@@ -170,6 +190,29 @@ def predict_map(model, X, tile=256, margin=32, device="cpu", return_conf=False):
         return _predict_tiles(torch, model, X, tile, margin, device, return_conf)
 
 
+def predict_probs(model, X, tile=256, margin=32, device="cpu"):
+    """Class probabilities (float16, classes x H x W) with the same seam-free tiling as predict_map."""
+    import torch
+    model.to(device).eval()
+    C, H, W = X.shape
+    s = tile - 2 * margin
+    Xp = np.pad(X, ((0, 0), (margin, margin), (margin, margin)), mode="reflect")
+    out = None
+    with torch.no_grad():
+        for r in range(0, H, s):
+            for c in range(0, W, s):
+                hh, ww = min(s, H - r), min(s, W - c)
+                crop = Xp[:, r:r + hh + 2 * margin, c:c + ww + 2 * margin]
+                ph, pw = (-crop.shape[1]) % 32, (-crop.shape[2]) % 32
+                crop = np.pad(crop, ((0, 0), (0, ph), (0, pw)), mode="reflect")
+                logits = model(torch.as_tensor(crop[None], dtype=torch.float32, device=device))[0]
+                p = logits[:, margin:margin + hh, margin:margin + ww].softmax(0).cpu().numpy()
+                if out is None:
+                    out = np.zeros((p.shape[0], H, W), dtype="float16")
+                out[:, r:r + hh, c:c + ww] = p
+    return out
+
+
 def _predict_tiles(torch, model, X, tile, margin, device, return_conf):
     model.to(device).eval()
     C, H, W = X.shape
@@ -235,7 +278,7 @@ def _device(device=None):
     return device or ("mps" if torch.backends.mps.is_available() else "cpu")
 
 
-def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250, tag=None, labels="esri"):
+def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250, tag=None, labels="esri", extra="none"):
     """Train on the 2023 composite with Esri 2023 labels; saves weights, band statistics and the loss curve."""
     import time
 
@@ -244,7 +287,7 @@ def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250
     device = _device(device)
     tag = tag or f"seed{seed}"
     OUT.mkdir(parents=True, exist_ok=True)
-    d = load_inputs("s2_2023", 2023, labels)
+    d = load_inputs("s2_2023", 2023, labels, extra)
     X, Y = d["X"], d["Y"]
     train_w, val_w = split_patches(Y.shape, 128, 64, 512, 0.25, seed=0)           # split seed is fixed, independent of `seed`
     mean, std = band_stats(X, train_w)
@@ -252,32 +295,33 @@ def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250
     cw = class_weights(Y, train_w)
     print(f"[{tag}] device {device} | train patches {len(train_w)} | val patches {len(val_w)} | class weights {cw.round(2)}", flush=True)
     torch.manual_seed(seed)
-    model = build_model()
+    model = build_model(in_ch=X.shape[0])
     t0 = time.time()
     losses = fit(model, Xs, Y, train_w, steps=steps, batch_size=batch_size, lr=lr, class_w=cw, device=device, seed=seed,
                  log_every=log_every)
     print(f"[{tag}] trained in {time.time() - t0:.0f} s | final loss {np.mean(losses[-100:]):.4f}", flush=True)
     torch.save(model.state_dict(), OUT / f"unet_{tag}.pt")
-    np.savez(OUT / "band_stats.npz", mean=mean, std=std)
+    np.savez(stats_path(tag, extra), mean=mean, std=std)
     pd.Series(losses, name="loss").to_csv(OUT / f"loss_{tag}.csv", index=False)
     (OUT / f"config_{tag}.json").write_text(__import__("json").dumps(
-        dict(seed=seed, steps=steps, batch_size=batch_size, lr=lr, device=device, composite="s2_2023", labels="io_lulc_2023" if labels == "esri" else "io_lulc_2023+worldcover_2021_consensus")))
+        dict(seed=seed, steps=steps, batch_size=batch_size, lr=lr, device=device, composite="s2_2023", labels="io_lulc_2023" if labels == "esri" else "io_lulc_2023+worldcover_2021_consensus",
+        extra=extra)))
     return tag
 
 
-def evaluate(tag="seed0", device=None, labels="esri"):
+def evaluate(tag="seed0", device=None, labels="esri", extra="none"):
     """Reload saved weights; agreement with the weak labels on held-out blocks; predict 2023 and 2025-26 maps."""
     import json
 
     import torch
     device = _device(device)
-    d = load_inputs("s2_2023", 2023, labels)
+    d = load_inputs("s2_2023", 2023, labels, extra)
     X, Y = d["X"], d["Y"]
     train_w, val_w = split_patches(Y.shape, 128, 64, 512, 0.25, seed=0)
-    st = np.load(OUT / "band_stats.npz")
+    st = np.load(stats_path(tag, extra))
     mean, std = st["mean"], st["std"]
     Xs = standardise(X, mean, std)
-    model = build_model()
+    model = build_model(in_ch=X.shape[0])
     model.load_state_dict(torch.load(OUT / f"unet_{tag}.pt", map_location="cpu"))
     val, trn = _val_canvas(Y.shape, val_w), _val_canvas(Y.shape, train_w)
     pred, conf = predict_map(model, Xs, tile=256, margin=32, device=device, return_conf=True)
@@ -294,7 +338,7 @@ def evaluate(tag="seed0", device=None, labels="esri"):
     (OUT / f"metrics_{tag}.json").write_text(json.dumps(res, indent=1))
     _write_map(OUT / f"landuse_2023_{tag}.tif", pred)
     _write_map(OUT / f"confidence_2023_{tag}.tif", conf)
-    X2 = grid.read_aligned(RAW / "s2_2025_26_dry.tif") / 10000.0
+    X2 = add_extra((grid.read_aligned(RAW / "s2_2025_26_dry.tif") / 10000.0).astype("float32"), extra)
     pred2 = predict_map(model, standardise(X2.astype("float32"), mean, std), tile=256, margin=32, device=device)
     _write_map(OUT / f"landuse_2025_26_{tag}.tif", pred2)
     m = grid.study_mask()
@@ -305,9 +349,9 @@ def evaluate(tag="seed0", device=None, labels="esri"):
     return res
 
 
-def run(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, tag=None, labels="esri"):
-    tag = train(seed, steps, batch_size, lr, device, tag=tag, labels=labels)
-    return evaluate(tag, device, labels)
+def run(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, tag=None, labels="esri", extra="none"):
+    tag = train(seed, steps, batch_size, lr, device, tag=tag, labels=labels, extra=extra)
+    return evaluate(tag, device, labels, extra)
 
 
 if __name__ == "__main__":
@@ -318,11 +362,12 @@ if __name__ == "__main__":
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--tag", default=None)
     ap.add_argument("--labels", choices=["esri", "consensus"], default="esri")
+    ap.add_argument("--extra", choices=["none", "ndvi"], default="none")
     ap.add_argument("--eval-only", action="store_true", help="skip training; evaluate saved weights for --tag")
     a = ap.parse_args()
     from src.wardmap import memory_guard
     memory_guard(5.0)
     if a.eval_only:
-        evaluate(a.tag or f"seed{a.seed}", labels=a.labels)
+        evaluate(a.tag or f"seed{a.seed}", labels=a.labels, extra=a.extra)
     else:
-        run(seed=a.seed, steps=a.steps, batch_size=a.batch, tag=a.tag, labels=a.labels)
+        run(seed=a.seed, steps=a.steps, batch_size=a.batch, tag=a.tag, labels=a.labels, extra=a.extra)

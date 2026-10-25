@@ -36,3 +36,8 @@ def test_consensus_never_adds_labels_that_esri_does_not_have():
     e, c = lu.labels_from(io, wc, "esri"), lu.labels_from(io, wc, "consensus")
     kept = c != lu.IGNORE
     assert (c[kept] == e[kept]).all() and kept.sum() <= (e != lu.IGNORE).sum()
+
+
+def test_multi_season_runs_keep_their_own_band_statistics_file():
+    assert lu.stats_path("seed0", "none").name == "band_stats.npz"                          # the original file is untouched
+    assert lu.stats_path("ms_seed0", "ndvi").name == "band_stats_ms_seed0.npz"
