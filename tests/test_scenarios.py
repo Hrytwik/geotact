@@ -68,3 +68,24 @@ def test_candidates_follow_the_registered_rules():
     assert c["corridor"].tolist() == [[True, True, True, False, False, False]]
     c2 = sc.candidates(m, np.ones_like(m, bool), flood * 0 + 50, near_water, built_share * 0, riparian * False)
     assert not c2["wetland"].any() and not c2["garden"].any() and not c2["corridor"].any()
+
+
+def test_two_nearest_gap_is_small_between_two_patches_and_infinite_near_only_one():
+    pid = np.zeros((10, 40), int); pid[3:6, 2:6] = 1; pid[3:6, 30:34] = 2
+    d = sc.two_nearest_gap(pid, [1, 2], max_px=40)
+    assert d[4, 18] < d[4, 8] or np.isclose(d[4, 18], d[4, 8])                           # midway is no worse than near one end
+    assert np.isfinite(d[4, 18])
+    d2 = sc.two_nearest_gap(pid, [1], max_px=40)
+    assert np.isinf(d2).all()                                                            # one patch only: no 'between'
+
+
+def test_unedited_map_reproduces_the_baseline_and_a_bridging_corridor_raises_connectivity():
+    m = np.full((40, 120), B, dtype=np.uint8)
+    m[5:25, 5:25] = T; m[5:25, 85:105] = T                                               # two 4 ha woods, 600 m apart
+    mask = np.ones_like(m, bool); osm = np.zeros_like(m, bool)
+    base = sc.metrics(m, mask, osm, built_px=int((m == B).sum()), min_px=100)
+    assert sc.metrics(m.copy(), mask, osm, built_px=int((m == B).sum()), min_px=100) == base
+    m2 = m.copy(); m2[12:18, 25:85] = CORRIDOR                                           # a corridor joining them
+    after = sc.metrics(m2, mask, osm, built_px=int((m == B).sum()), min_px=100)
+    assert after["pc"] > base["pc"] and after["open_space_share"] > base["open_space_share"]
+    assert after["runoff_m3"] < base["runoff_m3"]                                        # woods CN below built-up CN
