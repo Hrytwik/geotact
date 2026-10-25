@@ -1,0 +1,31 @@
+map,cls,users,users_se,producers,producers_se
+esri_2023,Water,0.488,0.079,0.807,0.112
+esri_2023,Trees,0.958,0.029,0.348,0.029
+esri_2023,Cropland,0.646,0.06,0.851,0.034
+esri_2023,Grass/Scrub,0.178,0.058,0.13,0.045
+esri_2023,Built-up,0.344,0.061,0.999,0.001
+esri_2023,Bare ground,0.675,0.075,0.041,0.011
+unet_2023_seed0,Water,0.487,0.082,0.741,0.116
+unet_2023_seed0,Trees,0.954,0.026,0.364,0.031
+unet_2023_seed0,Cropland,0.62,0.057,0.858,0.041
+unet_2023_seed0,Grass/Scrub,0.114,0.05,0.081,0.036
+unet_2023_seed0,Built-up,0.363,0.065,0.952,0.047
+unet_2023_seed0,Bare ground,0.312,0.162,0.065,0.031
+unet_2023_seed1,Water,0.484,0.082,0.734,0.115
+unet_2023_seed1,Trees,0.969,0.022,0.396,0.036
+unet_2023_seed1,Cropland,0.688,0.06,0.801,0.048
+unet_2023_seed1,Grass/Scrub,0.209,0.074,0.221,0.079
+unet_2023_seed1,Built-up,0.342,0.062,0.952,0.047
+unet_2023_seed1,Bare ground,0.217,0.112,0.038,0.01
+unet_2025_26_seed0,Water,0.378,0.111,0.93,0.043
+unet_2025_26_seed0,Trees,0.903,0.038,0.325,0.035
+unet_2025_26_seed0,Cropland,0.636,0.052,0.924,0.028
+unet_2025_26_seed0,Grass/Scrub,0.147,0.105,0.032,0.023
+unet_2025_26_seed0,Built-up,0.311,0.059,0.905,0.065
+unet_2025_26_seed0,Bare ground,0.366,0.213,0.054,0.018
+unet_2025_26_seed1,Water,0.448,0.116,0.97,0.015
+unet_2025_26_seed1,Trees,0.912,0.035,0.362,0.038
+unet_2025_26_seed1,Cropland,0.657,0.056,0.872,0.04
+unet_2025_26_seed1,Grass/Scrub,0.144,0.081,0.05,0.028
+unet_2025_26_seed1,Built-up,0.327,0.058,0.999,0.001
+unet_2025_26_seed1,Bare ground,0.887,0.053,0.083,0.034
