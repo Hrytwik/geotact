@@ -61,10 +61,12 @@ def model_probs(tag, X10, extra="none", device=None):
     import torch
 
     from src import landuse as lu
-    st = np.load(lu.stats_path(tag, extra))
+    from src.config import HOME_OUTPUTS
+    home = HOME_OUTPUTS / "landuse"                                   # trained models always come from Bhubaneswar
+    st = np.load(home / lu.stats_path(tag, extra).name)
     Xs = lu.standardise(lu.add_extra(X10, extra), st["mean"], st["std"])
     model = lu.build_model(in_ch=Xs.shape[0])
-    model.load_state_dict(torch.load(lu.OUT / f"unet_{tag}.pt", map_location="cpu"))
+    model.load_state_dict(torch.load(home / f"unet_{tag}.pt", map_location="cpu"))
     return lu.predict_probs(model, Xs, device=lu._device(device))
 
 
@@ -142,6 +144,15 @@ def run_correction():
     oof = cv_predict(F, y, folds, correction_model)
     print(f"correction: points per fold {np.bincount(folds).tolist()}; out-of-fold plain agreement {np.mean(oof == y):.3f}", flush=True)
     model = correction_model().fit(F, y)
+    import pickle
+    with open(lu.OUT / "correction_model.pkl", "wb") as fh:                # saved so other cities can apply it (T11)
+        pickle.dump(model, fh)
+    _apply(model, L)
+    return np.array([la.CLASSES[k] for k in oof])
+
+
+def _apply(model, L):
+    from src import landuse as lu
     H, Wd = L["esri"].shape
     out = np.zeros((H, Wd), dtype="uint8")
     for r0 in range(0, H, 200):
@@ -151,7 +162,32 @@ def run_correction():
                            L["nd"][:, r0:r1].reshape(8, -1), L["built"][sl].ravel())
         out[r0:r1] = model.predict(Fc).reshape(r1 - r0, Wd)
     _write(lu.OUT / "landuse_2023_corr.tif", out, lu.OUT / "landuse_2023_seed0.tif", "uint8")
-    return np.array([la.CLASSES[k] for k in oof])
+
+
+def transfer_city():
+    """Another city (GEOTACT_CITY): per-model maps from the Bhubaneswar U-Nets, their ensemble, then the saved correction model."""
+    import pickle
+
+    from src import grid
+    from src import landuse as lu
+    from src.config import HOME_OUTPUTS, RAW
+    lu.OUT.mkdir(parents=True, exist_ok=True)
+    like = RAW / "s2_2023.tif"
+    for comp, yr in (("s2_2023", "2023"), ("s2_2025_26_dry", "2025_26")):
+        X10 = (grid.read_aligned(RAW / f"{comp}.tif") / 10000.0).astype("float32")
+        probs = []
+        for tg in ENSEMBLE_TAGS:
+            P = model_probs(tg, X10)
+            _write(lu.OUT / f"landuse_{yr}_{tg}.tif", P.argmax(0), like, "uint8")
+            probs.append(P)
+        cls, mean = ensemble(probs)
+        _write(lu.OUT / f"landuse_{yr}_ens.tif", cls, like, "uint8")
+        _write(lu.OUT / f"probs_{yr}_ens.tif", np.round(mean * 100), like, "uint8")
+        print(f"transfer {yr}: ensemble written", flush=True)
+    with open(HOME_OUTPUTS / "landuse" / "correction_model.pkl", "rb") as fh:
+        model = pickle.load(fh)
+    _apply(model, _layers())
+    print("transfer: corrected map written", flush=True)
 
 
 def score_round(extra_maps=()):
@@ -186,7 +222,9 @@ if __name__ == "__main__":
 
     from src.wardmap import memory_guard
     memory_guard(4.5)
-    if "--ensemble" in sys.argv:
+    if "--transfer" in sys.argv:
+        transfer_city()
+    elif "--ensemble" in sys.argv:
         run_ensemble()
     elif "--score" in sys.argv:
         extra = [("multiseason_2023_seed0", "landuse_2023_ms_seed0.tif"), ("multiseason_2023_seed1", "landuse_2023_ms_seed1.tif")] \

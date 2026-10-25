@@ -149,8 +149,7 @@ def inputs(map_name="landuse_2023_seed0.tif"):
     with rasterio.open(OUTPUTS / "terrain" / "terrain_features.tif") as r:
         tf30 = r.transform
     fc = OUTPUTS / "flood_cnn"
-    survey = tw._city_percentile(np.nanmean([tw._city_percentile(np.load(fc / f"r3_scores_{m}.npy"))
-                                             for m in ("logistic", "forest", "lightgbm", "mlp")], axis=0))
+    survey = tw._city_percentile(tw.survey_soft_vote(fc))
     flood10 = tw._sample_30m(survey, tf30, tf, cm.shape)
     import geopandas as gpd
     geoms = []

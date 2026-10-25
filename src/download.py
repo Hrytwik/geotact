@@ -345,8 +345,27 @@ def osm():
     log("OSM: all endpoints failed")
 
 
+def roads():
+    """OpenStreetMap highway lines for the study box (needed by SDG 11.7.1)."""
+    out = RAW / "osm_highways.json"
+    if out.exists():
+        return log(f"skip {out.name}")
+    w, s, e, n = BBOX
+    q = f'[out:json][timeout:300];way["highway"]({s},{w},{n},{e});out geom;'
+    for ep in OVERPASS:
+        try:
+            r = requests.post(ep, data={"data": q}, headers=UA, timeout=400)
+            r.raise_for_status()
+            js = r.json()
+            out.write_text(json.dumps(js))
+            return log(f"saved {out.name} ways={len(js['elements'])} via {ep}")
+        except Exception as ex:
+            log(f"roads {ep} failed: {str(ex)[:100]}")
+    log("roads: all endpoints failed")
+
+
 DATASETS = dict(dem=dem, landcover=landcover, sentinel2=sentinel2, ndvi=ndvi_years, sentinel1=sentinel1,
-                lst=landsat_lst, rain=rainfall, gbif=gbif, osm=osm)
+                lst=landsat_lst, rain=rainfall, gbif=gbif, osm=osm, roads=roads)
 
 if __name__ == "__main__":
     from src.wardmap import memory_guard

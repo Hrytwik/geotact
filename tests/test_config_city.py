@@ -28,9 +28,9 @@ def test_cuttack_has_its_own_box_and_folders_but_models_load_from_home():
 
 def test_validation_points_never_write_into_the_bhubaneswar_label_folder_for_another_city():
     env = dict(os.environ, GEOTACT_CITY="cuttack")
-    code = "from src import validation_points as v; print(v.OUT, v.N_TOTAL, v.N_MIN)"
-    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, check=True).stdout.split()
+    code = "from src import validation_points as v; print(v.OUT, v.N_TOTAL, v.N_MIN, sep='|')"            # the path contains a space
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, check=True).stdout.strip().split("|")
     assert out[0].endswith("validation_cuttack") and out[1] == "150" and out[2] == "20"
     env.pop("GEOTACT_CITY")
-    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, check=True).stdout.split()
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, check=True).stdout.strip().split("|")
     assert out[0].endswith("/validation") and out[1] == "300" and out[2] == "40"

@@ -183,12 +183,12 @@ def class_accuracy(version="v1"):
     """User's accuracy per class index from the hand-label check: v1 = original U-Net map (T7), v2 = corrected map (T4c, cross-validated)."""
     import json
 
-    from src.config import OUTPUTS
+    from src.config import HOME_OUTPUTS
     from src.landuse import CLASSES
     if version == "v1":
-        users = json.loads((OUTPUTS / "landuse" / "accuracy.json").read_text())["all_300"]["unet_2023_seed0"]["users"]
+        users = json.loads((HOME_OUTPUTS / "landuse" / "accuracy.json").read_text())["all_300"]["unet_2023_seed0"]["users"]
     elif version == "v2":
-        users = json.loads((OUTPUTS / "landuse" / "improve_scores.json").read_text())["correction_2023_cv"]["users"]
+        users = json.loads((HOME_OUTPUTS / "landuse" / "improve_scores.json").read_text())["correction_2023_cv"]["users"]
     else:
         raise ValueError(version)
     return {i: users[c][0] for i, c in enumerate(CLASSES)}
@@ -205,6 +205,17 @@ def _sample_30m(arr30, tf30, tf10, shape10):
     out = np.full(shape10, np.nan, dtype="float32")
     out[ok] = arr30[r30[ok], c30[ok]]
     return out
+
+
+FLOOD_MODELS = ("logistic", "forest", "lightgbm", "mlp")
+
+
+def survey_soft_vote(fc_dir):
+    """Mean city percentile of the field-survey flood maps that exist (all four for Bhubaneswar, the transferred ones elsewhere)."""
+    maps = [_city_percentile(np.load(fc_dir / f"r3_scores_{m}.npy")) for m in FLOOD_MODELS if (fc_dir / f"r3_scores_{m}.npy").exists()]
+    if not maps:
+        raise FileNotFoundError(f"no field-survey flood maps in {fc_dir}")
+    return np.nanmean(maps, axis=0)
 
 
 def _city_percentile(arr):
@@ -264,9 +275,9 @@ def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500
         tf30 = r.transform
         elev30 = r.read(list(r.descriptions).index("elevation") + 1)
     fc = OUTPUTS / "flood_cnn"
-    survey = np.nanmean([_city_percentile(np.load(fc / f"r3_scores_{m}.npy")) for m in ("logistic", "forest", "lightgbm", "mlp")], axis=0)
-    survey = _city_percentile(survey)
-    urban = _city_percentile(np.load(fc / "r3_scores_urban_logistic.npy"))
+    survey = _city_percentile(survey_soft_vote(fc))
+    up = fc / "r3_scores_urban_logistic.npy"                               # absent for a transfer city
+    urban = _city_percentile(np.load(up)) if up.exists() else np.full(survey.shape, np.nan, dtype="float32")
     for name, arr in (("flood_survey_pct", survey), ("flood_urban_pct", urban), ("elevation_m", elev30)):
         z = zonal_mean(pid, _sample_30m(arr, tf30, tf10, pid.shape), n)
         nodes[name] = [z[i] for i in nodes.id]
@@ -279,8 +290,10 @@ def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500
     nodes["treeloss_flag_ha_100m"] = [tl[i] for i in nodes.id]
     # GBIF: each record to the nearest node within 100 m (observer-biased; descriptive only)
     from pyproj import Transformer
-    gb = pd.read_csv(RAW / "gbif" / "0037271-260928105237408.csv", sep="\t", low_memory=False,
-                     usecols=["gbifID", "species", "class", "decimalLatitude", "decimalLongitude", "coordinateUncertaintyInMeters", "year"])
+    gbf = sorted((RAW / "gbif").glob("*.csv")) if (RAW / "gbif").exists() else []
+    gb = pd.read_csv(gbf[0], sep="\t", low_memory=False,
+                     usecols=["gbifID", "species", "class", "decimalLatitude", "decimalLongitude", "coordinateUncertaintyInMeters", "year"]) if gbf else \
+        pd.DataFrame(columns=["gbifID", "species", "class", "decimalLatitude", "decimalLongitude", "coordinateUncertaintyInMeters", "year"])
     gb = gb[gb.coordinateUncertaintyInMeters.isna() | (gb.coordinateUncertaintyInMeters <= 1000)]
     x, y = Transformer.from_crs(4326, CRS, always_xy=True).transform(gb.decimalLongitude.values, gb.decimalLatitude.values)
     gr = np.floor((np.asarray(y) - tf10.f) / tf10.e).astype(int); gcn = np.floor((np.asarray(x) - tf10.c) / tf10.a).astype(int)
