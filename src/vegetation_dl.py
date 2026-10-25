@@ -65,7 +65,33 @@ def paired_auc_diff(a, b, y, n_boot=2000, seed=0):
     return dict(diff=float(roc_auc_score(y, a) - roc_auc_score(y, b)), ci=[float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))])
 
 
-def fit_windows(Xs, Ys, windows, patch=128, steps=3000, batch_size=16, lr=1e-3, seed=0, device="cpu", class_w=None):
+def loss_rich_windows(Ys, windows, patch=128, min_share=0.01):
+    """(window index, patch origin) pairs whose patch has at least min_share tree-loss pixels."""
+    return [(k, (r, c)) for k, Y in enumerate(Ys) for r, c in windows if (Y[r:r + patch, c:c + patch] == 2).mean() >= min_share]
+
+
+def draw(Ys, windows, rich, rng, rich_share=0.0):
+    """One training patch: with probability rich_share from the loss-rich list, otherwise a uniform window and origin."""
+    if rich and rng.random() < rich_share:
+        return rich[int(rng.integers(len(rich)))]
+    return int(rng.integers(len(Ys))), windows[int(rng.integers(len(windows)))]
+
+
+def inverse_frequency_weights(Ys, windows, patch=128, n_classes=3):
+    from src import landuse as lu
+    counts = np.zeros(n_classes)
+    for Y in Ys:
+        y = lu._gather(Y, windows, patch)
+        counts += np.bincount(y[y != IGNORE], minlength=n_classes)[:n_classes]
+    present = counts > 0
+    w = np.zeros(n_classes)
+    w[present] = counts[present].sum() / counts[present]
+    w[present] /= w[present].mean()
+    w[~present] = w[present].max() if present.any() else 1.0
+    return w.astype("float32")
+
+
+def fit_windows(Xs, Ys, windows, patch=128, steps=3000, batch_size=16, lr=1e-3, seed=0, device="cpu", class_w=None, rich=None, rich_share=0.0):
     """Train one U-Net on several time windows of the same grid: every batch item draws a random window and patch origin."""
     import torch
     from torch import nn
@@ -82,7 +108,7 @@ def fit_windows(Xs, Ys, windows, patch=128, steps=3000, batch_size=16, lr=1e-3, 
     for _ in range(steps):
         xs, ys = [], []
         for _ in range(batch_size):
-            k = int(rng.integers(len(Xs))); r, c = windows[int(rng.integers(len(windows)))]
+            k, (r, c) = draw(Ys, windows, rich, rng, rich_share)
             x, y = lu._augment(Xs[k][:, r:r + patch, c:c + patch], Ys[k][r:r + patch, c:c + patch], rng)
             xs.append(x); ys.append(y)
         yb = torch.as_tensor(np.stack(ys).astype("int64"), device=device)
@@ -98,7 +124,7 @@ def fit_windows(Xs, Ys, windows, patch=128, steps=3000, batch_size=16, lr=1e-3, 
 
 
 # ---------------------------------------------------------------- real run
-def run(seeds=(0, 1), steps=3000):
+def run(seeds=(0, 1), steps=3000, attempt=1):
     import json
 
     import rasterio
@@ -116,14 +142,19 @@ def run(seeds=(0, 1), steps=3000):
     Xs = [Z[window_indices(y)] for y in (2018, 2019, 2020)]
     Ys = [window_labels(E[y], E[y + 3]) for y in (2018, 2019, 2020)]
     train_w, val_w = lu.split_patches(Ys[0].shape, 128, 64, 512, 0.25, seed=0)
-    cw = np.mean([lu.class_weights(Y, train_w, n_classes=3) for Y in Ys], axis=0)
+    if attempt == 1:
+        cw, rich, rich_share = np.mean([lu.class_weights(Y, train_w, n_classes=3) for Y in Ys], axis=0), None, 0.0
+    else:                                                                  # attempt 2: targets the class collapse of attempt 1
+        cw, rich, rich_share = inverse_frequency_weights(Ys, train_w, 128, 3), loss_rich_windows(Ys, train_w, 128, 0.01), 0.5
+        print(f"attempt 2: loss-rich training patches {len(rich)} of {len(train_w) * len(Ys)}", flush=True)
+    sfx = "" if attempt == 1 else f"_attempt{attempt}"
     counts = {f"{y}-{y + 3}": {n: int((Y == k).sum()) for k, n in enumerate(("other", "stable_tree", "tree_loss"))} for y, Y in zip((2018, 2019, 2020), Ys)}
     print("training label counts:", counts, "| class weights", np.round(cw, 2).tolist(), flush=True)
     device = lu._device()
     target = Z[window_indices(2022)]
     probs, val = [], {}
     for s in seeds:
-        model, losses = fit_windows(Xs, Ys, train_w, steps=steps, seed=s, device=device, class_w=cw)
+        model, losses = fit_windows(Xs, Ys, train_w, steps=steps, seed=s, device=device, class_w=cw, rich=rich, rich_share=rich_share)
         print(f"seed {s}: final loss {np.mean(losses[-100:]):.4f}", flush=True)
         probs.append(lu.predict_probs(model, target, device=device).astype("float32"))
         pv = lu.predict_probs(model, Xs[2], device=device).argmax(0)                       # internal check on the 2020-2023 window
@@ -135,7 +166,7 @@ def run(seeds=(0, 1), steps=3000):
     with rasterio.open(lu.OUT / "landuse_2023_seed0.tif") as r:
         meta = r.meta.copy()
     meta.update(dtype="uint8", count=1, compress="deflate", nodata=None)
-    with rasterio.open(OUTPUTS / "vegetation" / "dl_tree_loss_prob_2022_2026.tif", "w", **meta) as dst:
+    with rasterio.open(OUTPUTS / "vegetation" / f"dl_tree_loss_prob_2022_2026{sfx}.tif", "w", **meta) as dst:
         dst.write(np.round(loss_prob * 100).astype("uint8"), 1)
     # test on the 40 hand-checked points
     sheet = pd.read_excel("validation/tree_loss_labels.xlsx", sheet_name="labels")
@@ -160,7 +191,7 @@ def run(seeds=(0, 1), steps=3000):
                                 plain_flag_flagged=int(flag[rr, cc].sum()), plain_flag_real_loss=int(y[flag[rr, cc]].sum()))
     d = res["deep_temporal_model"]
     res["meets_rule"] = bool(d["auc"] >= 0.75 and d["ci"][0] >= 0.60 and res["deep_minus_greenness_drop"]["ci"][1] >= 0)
-    (OUTPUTS / "vegetation" / "dl_tree_loss.json").write_text(json.dumps(res, indent=1, default=float))
+    (OUTPUTS / "vegetation" / f"dl_tree_loss{sfx}.json").write_text(json.dumps(res, indent=1, default=float))
     return res
 
 
@@ -169,5 +200,6 @@ if __name__ == "__main__":
 
     from src.wardmap import memory_guard
     memory_guard(4.5)
-    r = run()
+    import sys
+    r = run(attempt=2 if "--attempt2" in sys.argv else 1)
     print(json.dumps({k: v for k, v in r.items() if k not in ("internal_validation_2020_2023",)}, indent=1, default=float))

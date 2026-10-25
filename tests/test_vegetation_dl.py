@@ -41,3 +41,20 @@ def test_training_on_several_windows_runs_and_reduces_the_loss():
     Ys = [np.where(X[0] > 0, 1, 0).astype("uint8") for X in Xs]                           # learnable rule on the first channel
     model, losses = vd.fit_windows(Xs, Ys, [(0, 0)], patch=64, steps=40, batch_size=4, seed=0, device="cpu")
     assert len(losses) > 10 and np.mean(losses[-5:]) < np.mean(losses[:5])
+
+
+def test_loss_rich_patches_are_drawn_about_half_the_time():
+    Ys = [np.zeros((256, 256), "uint8")]; Ys[0][:64, :64] = 2                              # loss only in the top-left patch
+    wins = [(0, 0), (0, 128), (128, 0), (128, 128)]
+    rich = vd.loss_rich_windows(Ys, wins, patch=128, min_share=0.01)
+    assert rich == [(0, (0, 0))]
+    rng = np.random.default_rng(0)
+    draws = [vd.draw(Ys, wins, rich, rng, rich_share=0.5) for _ in range(2000)]
+    share = np.mean([d == (0, (0, 0)) for d in draws])
+    assert 0.5 < share < 0.7                                                            # half forced + a quarter of the rest
+
+
+def test_inverse_frequency_weights_make_the_rare_class_heaviest():
+    Y = np.zeros((128, 128), "uint8"); Y[:10, :10] = 2; Y[50:90, :] = 1
+    w = vd.inverse_frequency_weights([Y], [(0, 0)], patch=128, n_classes=3)
+    assert w[2] > w[1] > w[0] and np.isclose(w.mean(), 1.0)
