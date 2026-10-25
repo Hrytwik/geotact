@@ -26,11 +26,38 @@ def map_labels(io):
     return lut[np.asarray(io, dtype=np.uint8)]
 
 
-def load_inputs(composite="s2_2023", io_year=2023):
+# ESA WorldCover codes -> chapter classes (water and herbaceous wetland to Water, as Esri's flooded vegetation); snow and moss unusable
+WC_TO_CLASS = {10: 1, 95: 1, 20: 3, 30: 3, 40: 2, 50: 4, 60: 5, 80: 0, 90: 0}
+
+
+def wc_labels(wc):
+    lut = np.full(256, IGNORE, dtype=np.uint8)
+    for code, cls in WC_TO_CLASS.items():
+        lut[code] = cls
+    return lut[np.asarray(wc, dtype=np.uint8)]
+
+
+def consensus(esri_cls, wc_cls):
+    """Keep a label only where both products give the same usable class; everywhere else IGNORE."""
+    esri_cls, wc_cls = np.asarray(esri_cls, dtype=np.uint8), np.asarray(wc_cls, dtype=np.uint8)
+    keep = (esri_cls == wc_cls) & (esri_cls != IGNORE)
+    return np.where(keep, esri_cls, IGNORE).astype(np.uint8)
+
+
+def labels_from(io, wc, mode="esri"):
+    if mode == "esri":
+        return map_labels(io)
+    if mode == "consensus":
+        return consensus(map_labels(io), wc_labels(wc))
+    raise ValueError(f"unknown label mode {mode!r}")
+
+
+def load_inputs(composite="s2_2023", io_year=2023, labels="esri"):
     """X: (10, H, W) reflectance (NaN = no data); Y: (H, W) uint8 chapter classes (IGNORE = unusable)."""
     X = grid.read_aligned(RAW / f"{composite}.tif") / 10000.0
     io = grid.read_aligned(RAW / f"io_lulc_{io_year}.tif", resampling="nearest", dtype="uint8")
-    return dict(X=X.astype("float32"), Y=map_labels(io))
+    wc = grid.read_aligned(RAW / "worldcover_2021.tif", resampling="nearest", dtype="uint8") if labels == "consensus" else None
+    return dict(X=X.astype("float32"), Y=labels_from(io, wc, labels))
 
 
 # ---------------------------------------------------------------- spatial split
@@ -208,7 +235,7 @@ def _device(device=None):
     return device or ("mps" if torch.backends.mps.is_available() else "cpu")
 
 
-def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250, tag=None):
+def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250, tag=None, labels="esri"):
     """Train on the 2023 composite with Esri 2023 labels; saves weights, band statistics and the loss curve."""
     import time
 
@@ -217,7 +244,7 @@ def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250
     device = _device(device)
     tag = tag or f"seed{seed}"
     OUT.mkdir(parents=True, exist_ok=True)
-    d = load_inputs("s2_2023", 2023)
+    d = load_inputs("s2_2023", 2023, labels)
     X, Y = d["X"], d["Y"]
     train_w, val_w = split_patches(Y.shape, 128, 64, 512, 0.25, seed=0)           # split seed is fixed, independent of `seed`
     mean, std = band_stats(X, train_w)
@@ -234,17 +261,17 @@ def train(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, log_every=250
     np.savez(OUT / "band_stats.npz", mean=mean, std=std)
     pd.Series(losses, name="loss").to_csv(OUT / f"loss_{tag}.csv", index=False)
     (OUT / f"config_{tag}.json").write_text(__import__("json").dumps(
-        dict(seed=seed, steps=steps, batch_size=batch_size, lr=lr, device=device, composite="s2_2023", labels="io_lulc_2023")))
+        dict(seed=seed, steps=steps, batch_size=batch_size, lr=lr, device=device, composite="s2_2023", labels="io_lulc_2023" if labels == "esri" else "io_lulc_2023+worldcover_2021_consensus")))
     return tag
 
 
-def evaluate(tag="seed0", device=None):
+def evaluate(tag="seed0", device=None, labels="esri"):
     """Reload saved weights; agreement with the weak labels on held-out blocks; predict 2023 and 2025-26 maps."""
     import json
 
     import torch
     device = _device(device)
-    d = load_inputs("s2_2023", 2023)
+    d = load_inputs("s2_2023", 2023, labels)
     X, Y = d["X"], d["Y"]
     train_w, val_w = split_patches(Y.shape, 128, 64, 512, 0.25, seed=0)
     st = np.load(OUT / "band_stats.npz")
@@ -278,9 +305,9 @@ def evaluate(tag="seed0", device=None):
     return res
 
 
-def run(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, tag=None):
-    tag = train(seed, steps, batch_size, lr, device, tag=tag)
-    return evaluate(tag, device)
+def run(seed=0, steps=3000, batch_size=16, lr=1e-3, device=None, tag=None, labels="esri"):
+    tag = train(seed, steps, batch_size, lr, device, tag=tag, labels=labels)
+    return evaluate(tag, device, labels)
 
 
 if __name__ == "__main__":
@@ -290,11 +317,12 @@ if __name__ == "__main__":
     ap.add_argument("--steps", type=int, default=3000)
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--tag", default=None)
+    ap.add_argument("--labels", choices=["esri", "consensus"], default="esri")
     ap.add_argument("--eval-only", action="store_true", help="skip training; evaluate saved weights for --tag")
     a = ap.parse_args()
     from src.wardmap import memory_guard
     memory_guard(5.0)
     if a.eval_only:
-        evaluate(a.tag or f"seed{a.seed}")
+        evaluate(a.tag or f"seed{a.seed}", labels=a.labels)
     else:
-        run(seed=a.seed, steps=a.steps, batch_size=a.batch, tag=a.tag)
+        run(seed=a.seed, steps=a.steps, batch_size=a.batch, tag=a.tag, labels=a.labels)
