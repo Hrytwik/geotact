@@ -201,26 +201,25 @@ def build_scenarios(d, twin_pid, habitat_ids, budget_px=5000):
     return maps, chosen, cand, blocks, table
 
 
-def run(map_name="landuse_2023_seed0.tif", write=True):
+def run(map_name="landuse_2023_seed0.tif", write=True, suffix="", acc_version="v1"):
     import json
 
     import rasterio
 
     from src.config import OUTPUTS
-    out = OUTPUTS / "scenarios"
+    out = OUTPUTS / f"scenarios{suffix}"
     out.mkdir(exist_ok=True)
     d = inputs(map_name)
-    tw_pid = rasterio.open(OUTPUTS / "twin" / "patch_ids.tif").read(1)
-    nodes = pd.read_csv(OUTPUTS / "twin" / "nodes.csv")
+    tw_pid = rasterio.open(OUTPUTS / f"twin{suffix}" / "patch_ids.tif").read(1)
+    nodes = pd.read_csv(OUTPUTS / f"twin{suffix}" / "nodes.csv")
     hab = nodes[nodes.type.isin(["green", "water"])].id.tolist()
-    if map_name != "landuse_2023_seed0.tif":                                   # sensitivity: rebuild the patches of this map
+    if not suffix and map_name != "landuse_2023_seed0.tif":                    # sensitivity: rebuild the patches of this map
         tw_pid, tbl, _ = tw.label_patches(d["cm"], d["mask"], tw.GROUPS, 100)
         hab = tbl[tbl.type.isin(["green", "water"])].id.tolist()
     maps, chosen, cand, blocks, table = build_scenarios(d, tw_pid, hab)
     built_px = int(((d["cm"] == BUILT) & d["mask"]).sum())
-    acc = json.loads((OUTPUTS / "landuse" / "accuracy.json").read_text())["all_300"]["unet_2023_seed0"]["users"]
     from src.landuse import CLASSES
-    rel = {i: acc[c][0] for i, c in enumerate(CLASSES)}
+    rel = tw.class_accuracy(acc_version)
     res = {}
     base_runoff = {(P, h): runoff_volume_m3(maps["baseline"], d["mask"], P, CN[h]) for P in (50.0, 100.0, 150.0) for h in "BCD"}
     for name, m in maps.items():
@@ -247,7 +246,7 @@ def run(map_name="landuse_2023_seed0.tif", write=True):
                      runoff_m3=round(v["runoff_m3"]), runoff_change_pct_P100_C=round(v["runoff_change_pct"]["P100_C"], 3),
                      food_ha=round(v["food_ha"], 1), open_space_share=round(v["open_space_share"], 4), pc=v["pc"], eca_ha=round(v["eca_ha"], 1))
                 for k, v in res.items()]
-        pd.DataFrame(rows).to_csv("docs/scenario_metrics.csv", index=False)
+        pd.DataFrame(rows).to_csv(f"docs/scenario_metrics{suffix}.csv", index=False)
     return summary
 
 
@@ -257,7 +256,9 @@ if __name__ == "__main__":
 
     from src.wardmap import memory_guard
     memory_guard(4.0)
-    if "--sensitivity" in sys.argv:
+    if "--v2" in sys.argv:
+        s = run("landuse_2023_corr.tif", suffix="_v2", acc_version="v2")
+    elif "--sensitivity" in sys.argv:
         s = run("landuse_2023_cons_seed0.tif", write=False)
     else:
         s = run()

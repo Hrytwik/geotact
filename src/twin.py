@@ -179,6 +179,21 @@ def drainage_edges(pid, drains, elev, max_px, near=None):
 
 
 # ---------------------------------------------------------------- real build (T8)
+def class_accuracy(version="v1"):
+    """User's accuracy per class index from the hand-label check: v1 = original U-Net map (T7), v2 = corrected map (T4c, cross-validated)."""
+    import json
+
+    from src.config import OUTPUTS
+    from src.landuse import CLASSES
+    if version == "v1":
+        users = json.loads((OUTPUTS / "landuse" / "accuracy.json").read_text())["all_300"]["unet_2023_seed0"]["users"]
+    elif version == "v2":
+        users = json.loads((OUTPUTS / "landuse" / "improve_scores.json").read_text())["correction_2023_cv"]["users"]
+    else:
+        raise ValueError(version)
+    return {i: users[c][0] for i, c in enumerate(CLASSES)}
+
+
 def _sample_30m(arr30, tf30, tf10, shape10):
     """Value of a 30 m raster at the centre of every 10 m pixel (NaN outside)."""
     rows, cols = np.indices(shape10)
@@ -200,7 +215,7 @@ def _city_percentile(arr):
     return out
 
 
-def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500.0, write=True):
+def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500.0, write=True, suffix="", acc_version="v1"):
     import json
 
     import geopandas as gpd
@@ -212,7 +227,7 @@ def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500
     from src import landuse as lu
     from src.config import CRS, INTERIM, OUTPUTS, RAW
     from src.vegetation_crosscheck import conversion_masks
-    out_dir = OUTPUTS / "twin"
+    out_dir = OUTPUTS / f"twin{suffix}"
     out_dir.mkdir(exist_ok=True)
     with rasterio.open(OUTPUTS / "landuse" / map_name) as r:
         cm, tf10, crs = r.read(1), r.transform, r.crs
@@ -233,8 +248,7 @@ def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500
     tree = zonal_mean(pid, (cm == 1).astype(float), n); grass = zonal_mean(pid, (cm == 3).astype(float), n)
     nodes["tree_share"] = [tree[i] if t == "green" else np.nan for i, t in zip(nodes.id, nodes.type)]
     nodes["grass_share"] = [grass[i] if t == "green" else np.nan for i, t in zip(nodes.id, nodes.type)]
-    acc = json.loads((OUTPUTS / "landuse" / "accuracy.json").read_text())["all_300"]["unet_2023_seed0"]["users"]
-    class_acc = {i: acc[c][0] for i, c in enumerate(lu.CLASSES) if i in (0, 1, 2, 3)}
+    class_acc = {i: v for i, v in class_accuracy(acc_version).items() if i in (0, 1, 2, 3)}
     rel = reliability(pid, cm, class_acc, n)
     nodes["reliability"] = [rel[i] for i in nodes.id]
     group_classes = {"water": [0], "green": [1, 3], "farm": [2]}
@@ -329,7 +343,11 @@ if __name__ == "__main__":
 
     from src.wardmap import memory_guard
     memory_guard(4.0)
-    if "--sensitivity" in sys.argv:
+    if "--v2" in sys.argv:
+        import json
+        nodes, E, s = build("landuse_2023_corr.tif", suffix="_v2", acc_version="v2")
+        print(json.dumps({k: s[k] for k in ("nodes", "small_patch_ha", "edges", "pc", "gbif_records_assigned")}, indent=1, default=float))
+    elif "--sensitivity" in sys.argv:
         _, E2, s2 = build("landuse_2023_cons_seed0.tif", write=False)
         print("SENSITIVITY (consensus map):", s2["nodes"], s2["edges"], {k: round(v, 5) for k, v in s2["pc"].items()})
     else:

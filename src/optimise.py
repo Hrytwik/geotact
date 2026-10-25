@@ -122,7 +122,7 @@ def run_nsga(d, pop=200, gens=300, seed=0):
 
 
 # ---------------------------------------------------------------- real run (T10)
-def precompute(budget=150.0, cache=True):
+def precompute(budget=150.0, cache=True, map_name="landuse_2023_seed0.tif", suffix=""):
     """SiteData for the eligible blocks of T9: exact runoff and food changes, single-block connectivity gains (cached)."""
     import json
 
@@ -131,10 +131,10 @@ def precompute(budget=150.0, cache=True):
 
     from src import scenarios as sc
     from src.config import OUTPUTS
-    out = OUTPUTS / "optimise"
+    out = OUTPUTS / f"optimise{suffix}"
     out.mkdir(exist_ok=True)
     f = out / "site_data.npz"
-    d = sc.inputs()
+    d = sc.inputs(map_name)
     cm, mask = d["cm"], d["mask"]
     cand = sc.candidates(cm, mask, d["flood"], d["near_water"], d["built_share"], d["riparian"])
     blocks = sc.block_ids(cm.shape, 10)
@@ -188,7 +188,7 @@ def solution_map(x, ids, cm, cand, blocks):
     return m
 
 
-def run(budgets=(150.0, 75.0, 300.0), seeds=(0, 1, 2, 3, 4), pop=200, gens=300):
+def run(budgets=(150.0, 75.0, 300.0), seeds=(0, 1, 2, 3, 4), pop=200, gens=300, map_name="landuse_2023_seed0.tif", suffix=""):
     import dataclasses
     import json
 
@@ -197,8 +197,8 @@ def run(budgets=(150.0, 75.0, 300.0), seeds=(0, 1, 2, 3, 4), pop=200, gens=300):
 
     from src import scenarios as sc
     from src.config import OUTPUTS
-    out = OUTPUTS / "optimise"
-    data, ids, d, cand, blocks, base, built_px = precompute(budgets[0])
+    out = OUTPUTS / f"optimise{suffix}"
+    data, ids, d, cand, blocks, base, built_px = precompute(budgets[0], map_name=map_name, suffix=suffix)
     print(f"blocks {len(ids)} | allowed pairs {int(data.allowed[:, 1:].sum())} | base runoff {base['runoff_m3']:,.0f} food {base['food_ha']:.1f} ECA {base['eca_ha']:.1f}", flush=True)
     summary, all_rows = {}, []
     for budget in budgets:
@@ -240,7 +240,7 @@ def run(budgets=(150.0, 75.0, 300.0), seeds=(0, 1, 2, 3, 4), pop=200, gens=300):
     A = pd.concat(all_rows)
     A.to_csv(out / "front.csv", index=False)
     # comparison with the hand-made T9 combined scenario (152 ha) and representative 150 ha solutions
-    t9 = json.loads((OUTPUTS / "scenarios" / "metrics.json").read_text())["scenarios"]["combined"]
+    t9 = json.loads((OUTPUTS / f"scenarios{suffix}" / "metrics.json").read_text())["scenarios"]["combined"]
     c = np.array([t9["runoff_m3"], -t9["food_ha"], -(t9["eca_ha"] - base["eca_ha"])])
     M = A[(A.budget_ha == budgets[0]) & A.on_exact_front]
     Fm = np.column_stack([M.runoff_m3, -M.food_ha, -M.eca_gain_ha])
@@ -256,7 +256,7 @@ def run(budgets=(150.0, 75.0, 300.0), seeds=(0, 1, 2, 3, 4), pop=200, gens=300):
         with rasterio.open(out / f"solution_{k}.tif", "w", **meta) as dst:
             dst.write(solution_map(x, ids, d["cm"], cand, blocks).astype("uint8"), 1)
     (out / "summary.json").write_text(json.dumps(summary, indent=1, default=float))
-    M.drop(columns="x").sort_values("runoff_m3").to_csv("docs/optimisation_front_150ha.csv", index=False)
+    M.drop(columns="x").sort_values("runoff_m3").to_csv(f"docs/optimisation_front_150ha{suffix}.csv", index=False)
     return summary
 
 
@@ -265,7 +265,8 @@ if __name__ == "__main__":
 
     from src.wardmap import memory_guard
     memory_guard(4.0)
-    s = run()
+    import sys
+    s = run(map_name="landuse_2023_corr.tif", suffix="_v2") if "--v2" in sys.argv else run()
     print(json.dumps({k: v for k, v in s.items() if k != "representatives_150ha"}, indent=1, default=float))
     for k, v in s["representatives_150ha"].items():
         print(k, {kk: (round(vv, 3) if isinstance(vv, float) else vv) for kk, vv in v.items()})
