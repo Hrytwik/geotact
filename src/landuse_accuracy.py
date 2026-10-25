@@ -122,7 +122,9 @@ def run(n_boot=2000):
     lu = OUTPUTS / "landuse"
     maps = {"esri_2023": d.stratum.values}
     for name, f in (("unet_2023_seed0", "landuse_2023_seed0.tif"), ("unet_2023_seed1", "landuse_2023_seed1.tif"),
-                    ("unet_2025_26_seed0", "landuse_2025_26_seed0.tif"), ("unet_2025_26_seed1", "landuse_2025_26_seed1.tif")):
+                    ("unet_2025_26_seed0", "landuse_2025_26_seed0.tif"), ("unet_2025_26_seed1", "landuse_2025_26_seed1.tif"),
+                    ("cons_2023_seed0", "landuse_2023_cons_seed0.tif"), ("cons_2023_seed1", "landuse_2023_cons_seed1.tif"),
+                    ("cons_2025_26_seed0", "landuse_2025_26_cons_seed0.tif"), ("cons_2025_26_seed1", "landuse_2025_26_cons_seed1.tif")):
         maps[name] = sample_map(lu / f, d.x_utm.values, d.y_utm.values)
     res = {}
     for subset, mask in (("all_300", np.ones(len(d), bool)), ("sure_only", (d.conf == "Sure").values)):
@@ -138,6 +140,12 @@ def run(n_boot=2000):
             s, maps["unet_2023_seed0"][mask] == ref, maps["esri_2023"][mask] == ref, W, n_boot)
         res[subset]["diff_unet2025_minus_esri2023"] = paired_difference(
             s, maps["unet_2025_26_seed0"][mask] == ref, maps["esri_2023"][mask] == ref, W, n_boot)
+        res[subset]["diff_cons2023_minus_unet2023"] = paired_difference(
+            s, maps["cons_2023_seed0"][mask] == ref, maps["unet_2023_seed0"][mask] == ref, W, n_boot)
+        res[subset]["diff_cons2023_minus_esri2023"] = paired_difference(
+            s, maps["cons_2023_seed0"][mask] == ref, maps["esri_2023"][mask] == ref, W, n_boot)
+        res[subset]["diff_cons2025_minus_unet2025"] = paired_difference(
+            s, maps["cons_2025_26_seed0"][mask] == ref, maps["unet_2025_26_seed0"][mask] == ref, W, n_boot)
     conf = area_confusion(d.stratum.values, maps["unet_2023_seed0"], d.ref.values, W, CLASSES)
     res["area_confusion_unet_2023_seed0"] = conf.round(4).to_dict()
     res["ref_class_counts"] = d.ref.value_counts().to_dict()
@@ -152,7 +160,7 @@ def run(n_boot=2000):
     for name in maps:
         r = res["all_300"][name]; s = res["sure_only"][name]
         print(f"{name:20s} overall {100 * r['overall']:.1f}% [{100 * r['ci'][0]:.1f}, {100 * r['ci'][1]:.1f}]   sure-only ({s['n']} pts) {100 * s['overall']:.1f}%")
-    for k in ("diff_unet2023_minus_esri2023", "diff_unet2025_minus_esri2023"):
+    for k in ("diff_unet2023_minus_esri2023", "diff_unet2025_minus_esri2023", "diff_cons2023_minus_unet2023", "diff_cons2023_minus_esri2023", "diff_cons2025_minus_unet2025"):
         r = res["all_300"][k]
         print(f"{k}: {100 * r['diff']:+.1f} points [{100 * r['ci'][0]:+.1f}, {100 * r['ci'][1]:+.1f}] p {r['p']:.3f}")
     print("reference class counts:", res["ref_class_counts"])
