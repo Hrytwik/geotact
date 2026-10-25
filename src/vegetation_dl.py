@@ -123,6 +123,67 @@ def fit_windows(Xs, Ys, windows, patch=128, steps=3000, batch_size=16, lr=1e-3, 
     return model, losses
 
 
+def bitemporal_input(X1, X2, mean, std):
+    """Two dates' bands, each standardised with the same band statistics, stacked (NaN becomes the band mean)."""
+    from src import landuse as lu
+    return np.concatenate([lu.standardise(np.asarray(X1, "float32"), mean, std), lu.standardise(np.asarray(X2, "float32"), mean, std)])
+
+
+def run_bitemporal(seeds=(0, 1), steps=3000):
+    import json
+
+    import rasterio
+
+    from src import grid
+    from src import landuse as lu
+    from src.config import OUTPUTS, RAW
+    from src.vegetation_crosscheck import conversion_masks, ndvi_change
+    st = np.load(lu.OUT / "band_stats.npz")
+    rd_s2 = lambda n: (grid.read_aligned(RAW / f"{n}.tif") / 10000.0).astype("float32")
+    E21 = lu.map_labels(grid.read_aligned(RAW / "io_lulc_2021.tif", resampling="nearest", dtype="uint8"))
+    E23 = lu.map_labels(grid.read_aligned(RAW / "io_lulc_2023.tif", resampling="nearest", dtype="uint8"))
+    s21, s23 = rd_s2("s2_2021"), rd_s2("s2_2023")
+    Xtr = bitemporal_input(s21, s23, st["mean"], st["std"]); del s21
+    Ytr = window_labels(E21, E23)
+    train_w, val_w = lu.split_patches(Ytr.shape, 128, 64, 512, 0.25, seed=0)
+    cw = lu.class_weights(Ytr, train_w, n_classes=3)
+    rich = loss_rich_windows([Ytr], train_w, 128, 0.01)
+    print(f"bitemporal: label counts {[int((Ytr == k).sum()) for k in range(3)]} | loss-rich patches {len(rich)} of {len(train_w)} | weights {np.round(cw, 2).tolist()}", flush=True)
+    device = lu._device()
+    Xap = bitemporal_input(s23, rd_s2("s2_2025_26_dry"), st["mean"], st["std"]); del s23
+    probs, val = [], {}
+    for s in seeds:
+        model, losses = fit_windows([Xtr], [Ytr], train_w, steps=steps, seed=s, device=device, class_w=cw, rich=rich, rich_share=0.5)
+        print(f"seed {s}: final loss {np.mean(losses[-100:]):.4f}", flush=True)
+        probs.append(lu.predict_probs(model, Xap, device=device).astype("float32"))
+        pv = lu.predict_probs(model, Xtr, device=device).argmax(0)
+        ok = lu._val_canvas(Ytr.shape, val_w) & (Ytr != IGNORE)
+        val[f"seed{s}"] = np.round(lu.metrics(lu.confusion(pv[ok], Ytr[ok], n_classes=3))["f1"], 3).tolist()
+    loss_prob = np.mean(probs, axis=0)[2]
+    with rasterio.open(lu.OUT / "landuse_2023_seed0.tif") as r:
+        meta = r.meta.copy()
+    meta.update(dtype="uint8", count=1, compress="deflate", nodata=None)
+    with rasterio.open(OUTPUTS / "vegetation" / "dl_tree_loss_prob_bitemporal_2023_2026.tif", "w", **meta) as dst:
+        dst.write(np.round(loss_prob * 100).astype("uint8"), 1)
+    sheet = pd.read_excel("validation/tree_loss_labels.xlsx", sheet_name="labels")
+    key = pd.read_csv("validation/tree_loss_key_private_do_not_open.csv")
+    t = truth_from_sheet(sheet).merge(key[["id", "row", "col"]], on="id")
+    rr, cc, y = t.row.values, t.col.values, t.truth.values
+    chg = ndvi_change(lu.ndvi_seasons())
+    s_drop = -chg[rr, cc]; s_drop = np.where(np.isfinite(s_drop), s_drop, np.nanmedian(s_drop))
+    rdm = lambda f: rasterio.open(lu.OUT / f).read(1)
+    flag = conversion_masks(rdm("landuse_2023_seed0.tif"), rdm("landuse_2023_seed1.tif"), rdm("landuse_2025_26_seed0.tif"),
+                            rdm("landuse_2025_26_seed1.tif"), grid.study_mask())["converted"][rr, cc].astype(float)
+    s_dl = loss_prob[rr, cc]
+    auc, ci = auc_ci(s_dl, y)
+    res = dict(n_points=int(len(t)), n_loss=int(y.sum()), heldout_f1_2021_2023=val, deep_bitemporal=dict(auc=auc, ci=list(ci)),
+               deep_minus_greenness_drop=paired_auc_diff(s_dl, s_drop, y), deep_minus_unet_flag=paired_auc_diff(s_dl, flag, y),
+               city_share_loss_prob_over_50=float((loss_prob[grid.study_mask()] > 0.5).mean()))
+    res["meets_rule"] = bool(auc >= 0.75 and ci[0] >= 0.60 and res["deep_minus_greenness_drop"]["ci"][1] >= 0)
+    (OUTPUTS / "vegetation" / "dl_tree_loss_bitemporal.json").write_text(json.dumps(res, indent=1, default=float))
+    return res
+
+
 # ---------------------------------------------------------------- real run
 def run(seeds=(0, 1), steps=3000, attempt=1):
     import json
@@ -201,5 +262,5 @@ if __name__ == "__main__":
     from src.wardmap import memory_guard
     memory_guard(4.5)
     import sys
-    r = run(attempt=2 if "--attempt2" in sys.argv else 1)
+    r = run_bitemporal() if "--bitemporal" in sys.argv else run(attempt=2 if "--attempt2" in sys.argv else 1)
     print(json.dumps({k: v for k, v in r.items() if k not in ("internal_validation_2020_2023",)}, indent=1, default=float))

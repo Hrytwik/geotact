@@ -58,3 +58,11 @@ def test_inverse_frequency_weights_make_the_rare_class_heaviest():
     Y = np.zeros((128, 128), "uint8"); Y[:10, :10] = 2; Y[50:90, :] = 1
     w = vd.inverse_frequency_weights([Y], [(0, 0)], patch=128, n_classes=3)
     assert w[2] > w[1] > w[0] and np.isclose(w.mean(), 1.0)
+
+
+def test_bitemporal_input_stacks_two_standardised_dates():
+    a = np.ones((10, 4, 4), "float32"); b = np.full((10, 4, 4), 3.0, "float32"); b[0, 0, 0] = np.nan
+    mean, std = np.ones(10, "float32"), np.full(10, 2.0, "float32")
+    X = vd.bitemporal_input(a, b, mean, std)
+    assert X.shape == (20, 4, 4) and np.isfinite(X).all()
+    assert X[0, 1, 1] == 0.0 and X[10, 1, 1] == pytest.approx(1.0) and X[10, 0, 0] == 0.0       # NaN -> mean after scaling
