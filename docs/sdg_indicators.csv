@@ -1,0 +1,12 @@
+indicator,value
+"SDG 11.3.1 LCR/PGR, GHSL 2015-2020",0.3916
+"SDG 11.3.1 LCR/PGR, GHSL 2020-2025 (projection)",0.6076
+"SDG 11.3.1 LCR/PGR, Esri built-up 2017-2023 (sensitivity)",1.2778
+"SDG 11.7.1 public space share, corrected map baseline",0.2646
+"SDG 11.7.1, combined scenario v2",0.2731
+"SDG 11.7.1, balanced plan v2",0.272
+"SDG 11.7.1, original map baseline",0.1699
+"SDG 15.1.1 forest share, corrected map",0.2107
+"SDG 15.1.1, original map",0.0624
+"SDG 15.1.1, WorldCover 2021",0.3
+"SDG 15.1.1, combined scenario v2",0.2146
