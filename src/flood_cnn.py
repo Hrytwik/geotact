@@ -39,14 +39,14 @@ def _block(cin, cout):
 class FloodCNN(nn.Module):
     """Three conv blocks (32-64-64), global average pooling, dropout 0.3, one logit. Normalises its own input."""
 
-    def __init__(self, channels, mean=None, std=None):
+    def __init__(self, channels, mean=None, std=None, dropout=0.3):
         super().__init__()
         m = np.zeros(channels, "float32") if mean is None else mean
         s = np.ones(channels, "float32") if std is None else std
         self.register_buffer("mean", torch.as_tensor(m).view(1, -1, 1, 1))
         self.register_buffer("std", torch.as_tensor(s).view(1, -1, 1, 1))
         self.features = nn.Sequential(_block(channels, 32), _block(32, 64), _block(64, 64))
-        self.drop, self.out = nn.Dropout(0.3), nn.Linear(64, 1)
+        self.drop, self.out = nn.Dropout(dropout), nn.Linear(64, 1)
 
     def forward(self, x):
         x = torch.nan_to_num((x - self.mean) / self.std, nan=0.0)
@@ -102,11 +102,11 @@ def _fit(model, get_batch, y, seed, steps, batch):
     return model
 
 
-def train_cnn(x, y, seed=0, steps=STEPS, batch=BATCH):
+def train_cnn(x, y, seed=0, steps=STEPS, batch=BATCH, dropout=0.3):
     x, y = np.asarray(x, dtype="float32"), np.asarray(y)
     mean, std = fit_zscore(x)
     torch.manual_seed(seed)                                                # before construction: seeds the initial weights
-    return _fit(FloodCNN(x.shape[1], mean, std), lambda idx, rng: augment(x[idx], rng), y, seed, steps, batch)
+    return _fit(FloodCNN(x.shape[1], mean, std, dropout), lambda idx, rng: augment(x[idx], rng), y, seed, steps, batch)
 
 
 def train_mlp(X, y, seed=0, steps=STEPS, batch=BATCH, width=64, dropout=0.3):
