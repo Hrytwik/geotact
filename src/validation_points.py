@@ -14,14 +14,14 @@ from openpyxl import Workbook
 from openpyxl.worksheet.datavalidation import DataValidation
 from pyproj import Transformer
 
-from src.config import CRS, RAW, ROOT
+from src.config import CITY, CRS, RAW, ROOT
 
 CLASSES = ["Water", "Trees", "Cropland", "Grass/Scrub", "Built-up", "Bare ground"]
 # Esri/IO LULC codes -> chapter classes (4 = flooded vegetation goes to Water).
 IO_TO_CLASS = {1: 0, 4: 0, 2: 1, 5: 2, 11: 3, 7: 4, 8: 5}
-N_TOTAL, N_MIN, SEED = 300, 40, 2026
+N_TOTAL, N_MIN, SEED = (300, 40, 2026) if CITY == "bhubaneswar" else (150, 20, 2027)   # Cuttack: T11 sample
 
-OUT = ROOT / "validation"
+OUT = ROOT / ("validation" if CITY == "bhubaneswar" else f"validation_{CITY}")       # never overwrite the Bhubaneswar labels
 
 
 def main():
