@@ -1,7 +1,7 @@
 # Build plan — GeoAI urban digital twin, Bhubaneswar (tasks T0-T11)
 
-> **Summary:** Dependency-ordered, test-first plan for the build phase (grid, land-use U-Net, vegetation trend, flood model, accuracy estimator, graph twin, scenarios + SDG proxies, NSGA-II, optional transfer test), with each task's interface, tests, success evidence and known limitation. Executed one task at a time under the atomic-workflow discipline (no subagents; full suite run twice before each commit).
-> **Last updated:** 2026-10-22 (Amendment 2 registered: nested tuning/ensembles and an urban model)
+> **Summary:** Dependency-ordered, test-first plan and registered protocols + results for the build phase and the improvement round (grid, land-use U-Net and its accuracy/correction, vegetation trend and tree-loss checks, flood models and deep-learning attempts, graph twin, scenarios + SDG indicators, NSGA-II, Cuttack transfer), with each task's interface, tests, success evidence and known limitation. Executed one task at a time under the atomic-workflow discipline (no subagents; full suite run twice before each commit).
+> **Last updated:** 2026-10-25 (build complete; improvement round items 1-4 done, item 5 Cuttack paused by the authors, item 6 not started; see the results sections T4c-T11)
 
 Status key: [ ] todo, [~] in progress, [x] done and verified.
 
@@ -21,7 +21,13 @@ Order of execution: T0, T5, T4, T6, T7(code), T8, T9, T10, (T11).
 - [x] T0 grid + study mask (7 tests, suite run twice, committed)
 - [x] T5 vegetation trend (12 tests; suite 19/19 twice; outputs/vegetation/)
 - [x] T4 land-use U-Net (40 tests incl. outputs; suite run twice; outputs/landuse/)
-- [ ] T6 (sub-tasks: [x] T6a SAR evidence functions, 11 tests; [x] T6b terrain (16 tests; outputs/terrain/terrain_features.tif, 10 bands, 30 m); [x] T6c labels (flood_labels.py, 12 tests + 4 output tests; outputs/flood/); [x] T6d model, FROZEN (flood_model.py, 11 + 4 tests; outputs/flood/susceptibility_30m.tif); [x] T6e hotspot test: FAILED, reported not repaired)  - [~] T6f data DONE (flood_cnn_data.py, 8 tests; 129 flood cells, 25 non-flood, 10,000 background; flood cells per fold 42/16/32/7/32 so only the POOLED AUC is meaningful); T6g: shared evaluation module src/flood_cnn_eval.py + 6 tests DONE; baselines src/flood_cnn_baselines.py + 8 tests DONE and run (outputs/flood_cnn/baselines.json); CNN and the T6h hotspot test still to run (protocol registered)  - [ ] T7 (code)  - [ ] T8  - [ ] T9  - [ ] T10  - [ ] T11 (bonus)
+- [x] T6 flood (T6a-T6e radar model: hotspot test FAILED, reported; T6f-T6h deep model on field-surveyed points: CNN 0.701 fails R1, no model passes the hotspot test; T6i tuning: soft vote 0.785; T6j city-street model 0.692, hotspot second look FAILED; T6k deep-learning retry: 0.70-0.73, wall, data-limited)
+- [x] T7 land-use accuracy from the 300 hand labels: 53.8% (original), Esri 54.0%; T4b consensus labels 56-60%; T4c correction model 67.8% (cross-validated) now the product
+- [x] T5b/T5c vegetation: U-Net tree-loss cross-check (pixel level supported) and 40-point hand check (about half of flagged places really lost trees); T5d/T5e deep tree-loss models 0.43-0.75, wall; greenness drop 0.905
+- [x] T8 graph twin (v1 original map: 160 nodes; v2 corrected map: 475 nodes)
+- [x] T9 scenarios + stand-in SDG proxies (v1 and v2); T9b official-style SDG 11.3.1, 11.7.1, 15.1.1
+- [x] T10 NSGA-II site selection (v1 and v2)
+- [~] T11 transfer to Cuttack: city setting and layers built, downloads PAUSED by the authors (see PLAN.md improvement item 5)
 
 ## Common rules
 - Grid: EPSG:32645, 10 m, the Sentinel-2 composite grid (2895 x 2424). Study mask: BMC municipal polygon (166.5 sq km). Wards raster 1-67.
