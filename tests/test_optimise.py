@@ -73,3 +73,33 @@ def test_same_seed_gives_the_same_front():
     _, F1 = op.run_nsga(d, pop=30, gens=20, seed=3)
     _, F2 = op.run_nsga(d, pop=30, gens=20, seed=3)
     assert np.allclose(np.sort(F1, axis=0), np.sort(F2, axis=0))
+
+
+# ---------------------------------------------------------------- T14: optional fourth objective (heat), three-objective path unchanged
+def with_heat(d, seed=5):
+    rng = np.random.default_rng(seed)
+    n = d.allowed.shape[0]
+    h = np.zeros((n, 4)); h[:, 1] = -rng.uniform(0.0, 1.0, n); h[:, 2] = -rng.uniform(0.0, 0.3, n); h[:, 3] = -rng.uniform(0.2, 1.5, n)
+    import dataclasses
+    return dataclasses.replace(d, d_heat=h)
+
+
+def test_three_objective_problems_are_unchanged_and_heat_adds_a_fourth_column():
+    d = toy()
+    x = np.zeros((1, 7), int); x[0, 1] = 3
+    d.allowed[1, 3] = True
+    assert op.objectives(d, x).shape == (1, 3)
+    dh = with_heat(d)
+    f = op.objectives(dh, x)[0]
+    assert f.shape == (4,) and f[3] == pytest.approx(dh.d_heat[1, 3]) and f[:3] == pytest.approx(op.objectives(d, x)[0])
+
+
+def test_nsga2_with_heat_recovers_the_four_objective_brute_force_front():
+    d = with_heat(toy())
+    exact = brute_force(d)
+    assert exact.shape[1] == 4
+    X, F = op.run_nsga(d, pop=80, gens=150, seed=0)
+    n = np.arange(7)
+    assert F.shape[1] == 4 and all(d.allowed[n, x].all() and d.area[n, x].sum() <= d.budget + 1e-9 for x in X)
+    lo, hi = np.vstack([exact, F]).min(axis=0), np.vstack([exact, F]).max(axis=0)
+    assert op.hypervolume(F, lo, hi) >= 0.95 * op.hypervolume(exact, lo, hi)

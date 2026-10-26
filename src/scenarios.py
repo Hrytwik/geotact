@@ -200,7 +200,8 @@ def build_scenarios(d, twin_pid, habitat_ids, budget_px=5000):
     return maps, chosen, cand, blocks, table
 
 
-def run(map_name="landuse_2023_seed0.tif", write=True, suffix="", acc_version="v1"):
+def run(map_name="landuse_2023_seed0.tif", write=True, suffix="", acc_version="v1", twin_suffix=None, energy=None, heat=None):
+    """twin_suffix: which twin supplies the patches (default: the same suffix). energy / heat (T14): add food energy (GJ) and the heat-exposure change."""
     import json
 
     import rasterio
@@ -209,8 +210,9 @@ def run(map_name="landuse_2023_seed0.tif", write=True, suffix="", acc_version="v
     out = OUTPUTS / f"scenarios{suffix}"
     out.mkdir(exist_ok=True)
     d = inputs(map_name)
-    tw_pid = rasterio.open(OUTPUTS / f"twin{suffix}" / "patch_ids.tif").read(1)
-    nodes = pd.read_csv(OUTPUTS / f"twin{suffix}" / "nodes.csv")
+    ts = suffix if twin_suffix is None else twin_suffix
+    tw_pid = rasterio.open(OUTPUTS / f"twin{ts}" / "patch_ids.tif").read(1)
+    nodes = pd.read_csv(OUTPUTS / f"twin{ts}" / "nodes.csv")
     hab = nodes[nodes.type.isin(["green", "water"])].id.tolist()
     if not suffix and map_name != "landuse_2023_seed0.tif":                    # sensitivity: rebuild the patches of this map
         tw_pid, tbl, _ = tw.label_patches(d["cm"], d["mask"], tw.GROUPS, 100)
@@ -228,6 +230,12 @@ def run(map_name="landuse_2023_seed0.tif", write=True, suffix="", acc_version="v
         r["converted_ha"] = float(changed.sum() / 100.0)
         r["converted_from_ha"] = {CLASSES[k]: float((orig == k).sum() / 100.0) for k in np.unique(orig)}
         r["reliability_weighted_ha"] = float(sum(rel[int(k)] for k in orig) / 100.0) if len(orig) else 0.0
+        if energy is not None:
+            from src import optimise as op
+            r["food_gj"] = op.food_gj(m, d["mask"], energy)
+        if heat is not None:
+            from src import optimise as op
+            r["heat_c"] = op.ht_exact(m, d["cm"], heat)
         r["runoff_change_pct"] = {f"P{int(P)}_{h}": 100.0 * (runoff_volume_m3(m, d["mask"], P, CN[h]) - b) / b for (P, h), b in base_runoff.items()}
         res[name] = r
     summary = dict(map=map_name, candidate_ha={k: float(v.sum() / 100.0) for k, v in cand.items()}, chosen_blocks={k: len(v) for k, v in chosen.items()},
@@ -243,7 +251,8 @@ def run(map_name="landuse_2023_seed0.tif", write=True, suffix="", acc_version="v
         (out / "metrics.json").write_text(json.dumps(summary, indent=1, default=float))
         rows = [dict(scenario=k, converted_ha=v["converted_ha"], reliability_weighted_ha=round(v["reliability_weighted_ha"], 1),
                      runoff_m3=round(v["runoff_m3"]), runoff_change_pct_P100_C=round(v["runoff_change_pct"]["P100_C"], 3),
-                     food_ha=round(v["food_ha"], 1), open_space_share=round(v["open_space_share"], 4), pc=v["pc"], eca_ha=round(v["eca_ha"], 1))
+                     food_ha=round(v["food_ha"], 1), open_space_share=round(v["open_space_share"], 4), pc=v["pc"], eca_ha=round(v["eca_ha"], 1),
+                     **({} if energy is None else dict(food_gj=round(v["food_gj"], 1))), **({} if heat is None else dict(heat_exposure_change_c=round(v["heat_c"], 5))))
                 for k, v in res.items()]
         pd.DataFrame(rows).to_csv(f"docs/scenario_metrics{suffix}.csv", index=False)
     return summary
@@ -255,7 +264,11 @@ if __name__ == "__main__":
 
     from src.wardmap import memory_guard
     memory_guard(4.0)
-    if "--v2" in sys.argv:
+    if "--v3" in sys.argv:                                   # T14: food energy and heat added, patches of the existing v2 twin (same map)
+        from src import optimise as op
+        energy, heat = op.v3_inputs()
+        s = run(sys.argv[sys.argv.index("--v3") + 1], suffix="_v3", acc_version="v2", twin_suffix="_v2", energy=energy, heat=heat)
+    elif "--v2" in sys.argv:
         s = run("landuse_2023_corr.tif", suffix="_v2", acc_version="v2")
     elif "--sensitivity" in sys.argv:
         s = run("landuse_2023_cons_seed0.tif", write=False)

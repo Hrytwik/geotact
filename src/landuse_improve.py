@@ -110,48 +110,62 @@ def score(candidates, n_boot=2000):
     return res
 
 
-def _layers():
-    """Full-grid inputs of the correction model (same definitions at points and pixels)."""
+def _layers(probs_path=None, ens_path=None):
+    """Full-grid inputs of the correction model (same definitions at points and pixels). Defaults: the 2023 ensemble (T4c); the
+    live twin passes the ensemble of a newer composite."""
     import rasterio
     from scipy import ndimage as ndi
 
     from src import grid
     from src import landuse as lu
     from src.config import RAW
-    with rasterio.open(lu.OUT / "probs_2023_ens.tif") as r:
+    with rasterio.open(probs_path or lu.OUT / "probs_2023_ens.tif") as r:
         probs = r.read().astype("float32") / 100.0
         tf = r.transform
     esri = lu.map_labels(grid.read_aligned(RAW / "io_lulc_2023.tif", resampling="nearest", dtype="uint8"))
     wc = lu.wc_labels(grid.read_aligned(RAW / "worldcover_2021.tif", resampling="nearest", dtype="uint8"))
     nd = stack_inputs(np.zeros((0,) + esri.shape, "float32"), lu.ndvi_seasons())
-    ens = rasterio.open(lu.OUT / "landuse_2023_ens.tif").read(1)
+    ens = rasterio.open(ens_path or lu.OUT / "landuse_2023_ens.tif").read(1)
     built = ndi.uniform_filter((ens == 4).astype("float32"), size=31, mode="nearest")
     return dict(probs=probs, esri=esri, wc=wc, nd=nd, built=built, tf=tf)
 
 
-def run_correction():
+def correction_training(L):
+    """Training table of the correction model: features at the 300 hand-labelled points, labels and the 4 km spatial folds."""
     import rasterio
 
-    from src import landuse as lu
     from src import landuse_accuracy as la
-    L = _layers()
     d, W = la.load_inputs()
     rr, cc = rasterio.transform.rowcol(L["tf"], d.x_utm.values, d.y_utm.values)
     rr, cc = np.asarray(rr), np.asarray(cc)
     F = features_from(L["probs"][:, rr, cc], L["esri"][rr, cc], L["wc"][rr, cc], L["nd"][:, rr, cc], L["built"][rr, cc])
     y = np.array([la.CLASSES.index(c) for c in d.ref])
-    folds = point_folds(d.x_utm.values, d.y_utm.values, 4000.0, 5, 0)
+    return F, y, point_folds(d.x_utm.values, d.y_utm.values, 4000.0, 5, 0)
+
+
+def save_correction_model(L=None):
+    """Fit the T4c correction on all 300 points and save it, WITHOUT rewriting any map (live twin and transfer apply it)."""
+    import pickle
+
+    from src import landuse as lu
+    F, y, _ = correction_training(L or _layers())
+    model = correction_model().fit(F, y)
+    with open(lu.OUT / "correction_model.pkl", "wb") as fh:
+        pickle.dump(model, fh)
+    return model
+
+
+def run_correction():
+    from src import landuse_accuracy as la
+    L = _layers()
+    F, y, folds = correction_training(L)
     oof = cv_predict(F, y, folds, correction_model)
     print(f"correction: points per fold {np.bincount(folds).tolist()}; out-of-fold plain agreement {np.mean(oof == y):.3f}", flush=True)
-    model = correction_model().fit(F, y)
-    import pickle
-    with open(lu.OUT / "correction_model.pkl", "wb") as fh:                # saved so other cities can apply it (T11)
-        pickle.dump(model, fh)
-    _apply(model, L)
+    _apply(save_correction_model(L), L)
     return np.array([la.CLASSES[k] for k in oof])
 
 
-def _apply(model, L):
+def _apply(model, L, out_path=None):
     from src import landuse as lu
     H, Wd = L["esri"].shape
     out = np.zeros((H, Wd), dtype="uint8")
@@ -161,7 +175,7 @@ def _apply(model, L):
         Fc = features_from(L["probs"][:, r0:r1].reshape(6, -1), L["esri"][sl].ravel(), L["wc"][sl].ravel(),
                            L["nd"][:, r0:r1].reshape(8, -1), L["built"][sl].ravel())
         out[r0:r1] = model.predict(Fc).reshape(r1 - r0, Wd)
-    _write(lu.OUT / "landuse_2023_corr.tif", out, lu.OUT / "landuse_2023_seed0.tif", "uint8")
+    _write(out_path or lu.OUT / "landuse_2023_corr.tif", out, lu.OUT / "landuse_2023_seed0.tif", "uint8")
 
 
 def transfer_city():
@@ -224,6 +238,9 @@ if __name__ == "__main__":
     memory_guard(4.5)
     if "--transfer" in sys.argv:
         transfer_city()
+    elif "--save-model" in sys.argv:
+        save_correction_model()
+        print("correction model saved (no map rewritten)", flush=True)
     elif "--ensemble" in sys.argv:
         run_ensemble()
     elif "--score" in sys.argv:

@@ -12,7 +12,7 @@ import warnings
 # Streaming Cloud-Optimised GeoTIFFs: fail fast and retry instead of hanging on a stalled read.
 os.environ.update(GDAL_HTTP_TIMEOUT="60", GDAL_HTTP_MAX_RETRY="5", GDAL_HTTP_RETRY_DELAY="3",
                   GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", GDAL_HTTP_MULTIPLEX="YES",
-                  CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif,.tiff", VSI_CACHE="TRUE")
+                  CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif,.tiff,.vrt,.gpkg", VSI_CACHE="TRUE")   # .vrt/.gpkg: AlphaEarth (aef)
 
 import numpy as np
 import pandas as pd
@@ -62,16 +62,20 @@ def write_items(items, path):
 
 # ---------------------------------------------------------------- Sentinel-2
 
+def select_items(datetime, max_cloud=20, n_best=8):
+    """Scenes a composite uses: items under max_cloud, restricted to the n_best clearest acquisition days (slow link, ~1 MB/s)."""
+    items = search("sentinel-2-l2a", datetime, {"eo:cloud_cover": {"lt": max_cloud}})
+    days = sorted({i.datetime.date() for i in items},
+                  key=lambda d: min(i.properties["eo:cloud_cover"] for i in items if i.datetime.date() == d))
+    keep = set(days[:n_best])
+    return [i for i in items if i.datetime.date() in keep], keep
+
+
 def s2_composite(name, datetime, max_cloud=20, bands=S2_BANDS, n_best=8):
     out = RAW / f"s2_{name}.tif"
     if out.exists():
         return log(f"skip {out.name}")
-    items = search("sentinel-2-l2a", datetime, {"eo:cloud_cover": {"lt": max_cloud}})
-    # Slow link (~1 MB/s): keep only the clearest acquisition days for the median composite.
-    days = sorted({i.datetime.date() for i in items},
-                  key=lambda d: min(i.properties["eo:cloud_cover"] for i in items if i.datetime.date() == d))
-    keep = set(days[:n_best])
-    items = [i for i in items if i.datetime.date() in keep]
+    items, keep = select_items(datetime, max_cloud, n_best)
     log(f"S2 {name}: {len(items)} items on {len(keep)} clearest days")
     write_items(items, RAW / f"s2_{name}_scenes.json")
 
@@ -364,8 +368,67 @@ def roads():
     log("roads: all endpoints failed")
 
 
+AEF_INDEX = "/vsicurl/https://data.source.coop/tge-labs/aef/v1/annual/aef_index.gpkg"
+
+
+def aef(years=(2025,), block=256):
+    """AlphaEarth Foundations annual satellite embedding (64 int8 channels, de-quantise with sign(v) * (v / 127.5)^2, -128 = no data;
+    CC-BY 4.0, 'produced by Google and Google DeepMind'), read from the public Source Cooperative copy through its VRT (which fixes
+    the bottom-up row order) for exactly our 10 m grid window. Raw int8 values are stored."""
+    import geopandas as gpd
+    import rasterio
+    from rasterio.windows import Window
+
+    from src import grid
+    g = grid.load_grid()
+    idx = gpd.read_file(AEF_INDEX, bbox=BBOX)
+    for year in years:
+        out = RAW / f"aef_{year}.tif"
+        if out.exists():
+            log(f"skip {out.name}"); continue
+        row = idx[(idx.year == year) & (idx["crs"] == CRS)]          # the column, not GeoDataFrame.crs (the frame's own CRS)
+        x0, y0 = g.transform.c, g.transform.f
+        x1, y1 = x0 + g.shape[1] * g.res, y0 - g.shape[0] * g.res
+        row = row[(row.utm_west <= x0) & (row.utm_east >= x1) & (row.utm_north >= y0) & (row.utm_south <= y1)]
+        if len(row) != 1:
+            raise RuntimeError(f"AEF {year}: {len(row)} files cover the whole grid; a mosaic would be needed")
+        url = "/vsicurl/https://data.source.coop/" + row.path.iloc[0].split("opendata.source.coop/")[1].replace(".tiff", ".vrt")
+        # the VRT names its source as /vsis3/ on a public bucket: anonymous access (checked: VRT read == flipped direct read)
+        with rasterio.Env(AWS_NO_SIGN_REQUEST="YES", AWS_REGION="us-west-2"), rasterio.open(url) as src:
+            c0, r0 = (x0 - src.transform.c) / src.transform.a, (src.transform.f - y0) / -src.transform.e
+            assert float(c0).is_integer() and float(r0).is_integer() and src.transform.a == g.res, "AEF grid not aligned with ours"
+            prof = dict(driver="GTiff", height=g.shape[0], width=g.shape[1], count=64, dtype="int8", nodata=-128, crs=g.crs,
+                        transform=g.transform, compress="deflate", tiled=True)
+            with rasterio.open(out.with_suffix(".part.tif"), "w", **prof) as dst:
+                for r in range(0, g.shape[0], block):
+                    h = min(block, g.shape[0] - r)
+                    w = Window(int(c0), int(r0) + r, g.shape[1], h)
+                    data = load_with_retry(lambda: src.read(window=w), f"AEF {year} rows {r}")
+                    if data is None:
+                        raise RuntimeError(f"AEF {year}: rows {r} failed")
+                    dst.write(data, window=Window(0, r, g.shape[1], h))
+                dst.descriptions = tuple(f"A{k:02d}" for k in range(64))
+        out.with_suffix(".part.tif").rename(out)
+        log(f"saved {out.name} from {row.path.iloc[0]}")
+
+
+GLANCE_URL = "https://nccd.gov.in/uploads/Agricultural_Statisitcs_at_a_Glance_2024_25_11da3cd37d.pdf"
+
+
+def glance():
+    """Ministry of Agriculture & Farmers Welfare, 'Agricultural Statistics at a Glance 2024-25' (state-wise yields; T14 food factors)."""
+    out = RAW / "external" / "moa" / "Agricultural_Statistics_at_a_Glance_2024_25.pdf"
+    if out.exists():
+        return log(f"skip {out.name}")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    r = requests.get(GLANCE_URL, timeout=1800, headers={"User-Agent": "Mozilla/5.0"})
+    r.raise_for_status()
+    out.write_bytes(r.content)
+    log(f"saved {out.name} {len(r.content)} bytes")
+
+
 DATASETS = dict(dem=dem, landcover=landcover, sentinel2=sentinel2, ndvi=ndvi_years, sentinel1=sentinel1,
-                lst=landsat_lst, rain=rainfall, gbif=gbif, osm=osm, roads=roads)
+                lst=landsat_lst, rain=rainfall, gbif=gbif, osm=osm, roads=roads, aef=aef, glance=glance)
 
 if __name__ == "__main__":
     from src.wardmap import memory_guard

@@ -128,9 +128,39 @@ def run():
     return res
 
 
+def plans_v3():
+    """T14: SDG 11.7.1 and 15.1.1 for the baseline and for every representative plan of the four-objective optimisation (same product map).
+    Self-check: the baseline must reproduce the published v2 values (0.2646 and 0.2107)."""
+    import json
+
+    import pandas as pd
+    import rasterio
+
+    from src import grid
+    from src import landuse as lu
+    from src import scenarios as sc
+    from src.config import OUTPUTS
+    mask = grid.study_mask()
+    with rasterio.open(lu.OUT / "landuse_2023_corr.tif") as r:
+        v2, tf = r.read(1), r.transform
+    street, _ = _streets(tf, v2.shape)
+    osm = sc.inputs("landuse_2023_corr.tif")["osm"]
+    share = lambda m: open_public_space_share(osm, street, m == 4, mask, np.isin(m, [6, 8]))
+    forest = lambda m: forest_share(np.where(m == 8, 1, m), mask)
+    rows = [dict(plan="baseline", share_11_7_1=share(v2), forest_15_1_1=forest(v2))]
+    assert abs(rows[0]["share_11_7_1"] - 0.2646) < 5e-4 and abs(rows[0]["forest_15_1_1"] - 0.2107) < 5e-4, "baseline does not reproduce the T9b values"
+    for f in sorted((OUTPUTS / "optimise_v3").glob("solution_*.tif")) + [OUTPUTS / "scenarios_v3" / "combined.tif"]:
+        m = rasterio.open(f).read(1)
+        rows.append(dict(plan=f.stem if f.parent.name != "scenarios_v3" else "combined_scenario", share_11_7_1=share(m), forest_15_1_1=forest(m)))
+    df = pd.DataFrame(rows)
+    df.to_csv("docs/sdg_indicators_v3.csv", index=False)
+    return df
+
+
 if __name__ == "__main__":
     import json
+    import sys
 
     from src.wardmap import memory_guard
     memory_guard(4.0)
-    print(json.dumps(run(), indent=1, default=float))
+    print(plans_v3().to_string(index=False) if "--v3" in sys.argv else json.dumps(run(), indent=1, default=float))

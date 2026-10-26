@@ -226,7 +226,9 @@ def _city_percentile(arr):
     return out
 
 
-def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500.0, write=True, suffix="", acc_version="v1"):
+def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500.0, write=True, suffix="", acc_version="v1",
+          map_path=None, out_dir=None):
+    """map_path / out_dir override the default locations (the live twin builds dated versions elsewhere)."""
     import json
 
     import geopandas as gpd
@@ -238,9 +240,9 @@ def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500
     from src import landuse as lu
     from src.config import CRS, INTERIM, OUTPUTS, RAW
     from src.vegetation_crosscheck import conversion_masks
-    out_dir = OUTPUTS / f"twin{suffix}"
-    out_dir.mkdir(exist_ok=True)
-    with rasterio.open(OUTPUTS / "landuse" / map_name) as r:
+    out_dir = out_dir or OUTPUTS / f"twin{suffix}"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with rasterio.open(map_path or OUTPUTS / "landuse" / map_name) as r:
         cm, tf10, crs = r.read(1), r.transform, r.crs
     study = grid.study_mask()
     pid, nodes, small = label_patches(cm, study, GROUPS, min_px)
@@ -302,6 +304,10 @@ def build(map_name="landuse_2023_seed0.tif", min_px=100, d50=500.0, max_gap=1500
     rec = g_in.groupby("node").size(); spp = g_in.groupby("node").species.nunique()
     nodes["gbif_records"] = nodes.id.map(rec).fillna(0).astype(int)
     nodes["gbif_species"] = nodes.id.map(spp).fillna(0).astype(int)
+    # T12b: bias-aware bird-habitat suitability (adopted guilds only), recomputed on this map
+    from src import biodiversity as bd
+    for k, z in bd.node_suitability(cm, tf10, pid, n).items():
+        nodes[f"bird_{k}_suit"] = [z[i] for i in nodes.id]
     # edges
     types = dict(zip(nodes.id, nodes.type))
     adj = patch_gaps(pid, list(nodes.id), max_gap_m=10.0)
