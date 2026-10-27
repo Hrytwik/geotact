@@ -70,8 +70,20 @@ def hypervolume(F, lo, hi, ref=1.1):
     return float(HV(ref_point=np.full(np.asarray(F).shape[1], ref)).do((np.asarray(F) - lo) / span))
 
 
-def run_nsga(d, pop=200, gens=300, seed=0):
+def archive_update(AX, AF, X, F):
+    """External non-dominated archive: merge new solutions, drop duplicates (same decision vector) and dominated rows."""
+    X, F = np.vstack([AX, np.asarray(X, int)]), np.vstack([AF, np.asarray(F, float)])
+    X, i = np.unique(X, axis=0, return_index=True)
+    F = F[i]
+    keep = pareto_mask(F)
+    return X[keep], F[keep]
+
+
+def run_nsga(d, pop=200, gens=300, seed=0, archive_every=None, return_final=False):
+    """NSGA-II on the site problem. With archive_every = k, the feasible population is merged into an external non-dominated
+    archive every k generations (and at the end) and the archive is returned instead of the final population (T19b)."""
     from pymoo.algorithms.moo.nsga2 import NSGA2
+    from pymoo.core.callback import Callback
     from pymoo.core.mutation import Mutation
     from pymoo.core.problem import Problem
     from pymoo.core.repair import Repair
@@ -118,11 +130,44 @@ def run_nsga(d, pop=200, gens=300, seed=0):
         def _do(self, problem, X, **kwargs):
             return repair(d, X, rng_of(kwargs))
 
+    class Archive(Callback):
+        def __init__(self):
+            super().__init__()
+            self.X, self.F = np.empty((0, n), int), np.empty((0, 4 if d.d_heat is not None else 3))
+
+        def notify(self, algorithm):
+            if algorithm.n_gen % archive_every == 0 or algorithm.n_gen >= gens:
+                P = algorithm.pop
+                ok = P.get("CV").ravel() <= 0
+                self.X, self.F = archive_update(self.X, self.F, P.get("X")[ok].astype(int), P.get("F")[ok])
+
     algo = NSGA2(pop_size=pop, sampling=SiteSampling(), crossover=UniformCrossover(), mutation=SiteMutation(),
                  repair=SiteRepair(), eliminate_duplicates=True)
-    res = minimize(SiteProblem(), algo, ("n_gen", gens), seed=seed, verbose=False)
+    cb = Archive() if archive_every else None
+    res = minimize(SiteProblem(), algo, ("n_gen", gens), seed=seed, verbose=False, **({"callback": cb} if cb is not None else {}))
+    if cb is not None:
+        Xp = np.atleast_2d(res.X).astype(int)
+        X, _ = archive_update(cb.X, cb.F, Xp, objectives(d, Xp))
+        return (X, objectives(d, X), Xp, objectives(d, Xp)) if return_final else (X, objectives(d, X))
     X = np.atleast_2d(res.X).astype(int)
     return X, objectives(d, X)
+
+
+def exact_row(dd, x, ids, d, cand, blocks, base, built_px, energy=None, heat=None):
+    """Exact map metrics of one plan x next to the search's additive predictions (one row of the front table)."""
+    from src import scenarios as sc
+    fc, fpc = ("food_gj", "food_pred_gj") if energy is not None else ("food_ha", "food_pred_ha")
+    m = solution_map(x, ids, d["cm"], cand, blocks)
+    ex = sc.metrics(m, d["mask"], d["osm"], built_px)
+    f = objectives(dd, x[None])[0]
+    a = dd.area[np.arange(len(x)), x]
+    return dict(budget_ha=dd.budget, area_ha=float(area_used(dd, x[None])[0]),
+                wetland_ha=float(a[x == 1].sum()), garden_ha=float(a[x == 2].sum()), corridor_ha=float(a[x == 3].sum()),
+                runoff_m3=ex["runoff_m3"], runoff_pred_m3=f[0],
+                **{fc: ex["food_ha"] if energy is None else food_gj(m, d["mask"], energy), fpc: -f[1]},
+                eca_gain_ha=ex["eca_ha"] - base["eca_ha"], eca_gain_surrogate_ha=-f[2], open_space_share=ex["open_space_share"],
+                **({} if heat is None else dict(heat_c=ht_exact(m, d["cm"], heat), heat_pred_c=f[3])),
+                x=",".join(map(str, x)))
 
 
 # ---------------------------------------------------------------- real run (T10)
@@ -256,20 +301,7 @@ def run(budgets=(150.0, 75.0, 300.0), seeds=(0, 1, 2, 3, 4), pop=200, gens=300, 
             fronts[s] = X
             print(f"  budget {budget:.0f} ha seed {s}: {len(X)} front solutions", flush=True)
         U = np.unique(np.vstack(list(fronts.values())), axis=0)
-        rows = []
-        for x in U:
-            m = solution_map(x, ids, d["cm"], cand, blocks)
-            ex = sc.metrics(m, d["mask"], d["osm"], built_px)
-            f = objectives(dd, x[None])[0]
-            rows.append(dict(budget_ha=budget, area_ha=float(area_used(dd, x[None])[0]),
-                             wetland_ha=float(dd.area[np.arange(len(x)), x][x == 1].sum()), garden_ha=float(dd.area[np.arange(len(x)), x][x == 2].sum()),
-                             corridor_ha=float(dd.area[np.arange(len(x)), x][x == 3].sum()),
-                             runoff_m3=ex["runoff_m3"], runoff_pred_m3=f[0],
-                             **{fc: ex["food_ha"] if energy is None else food_gj(m, d["mask"], energy), fpc: -f[1]},
-                             eca_gain_ha=ex["eca_ha"] - base["eca_ha"], eca_gain_surrogate_ha=-f[2], open_space_share=ex["open_space_share"],
-                             **({} if heat is None else dict(heat_c=ht_exact(m, d["cm"], heat), heat_pred_c=f[3])),
-                             x=",".join(map(str, x))))
-        R = pd.DataFrame(rows)
+        R = pd.DataFrame([exact_row(dd, x, ids, d, cand, blocks, base, built_px, energy, heat) for x in U])
         Fe = np.column_stack([R.runoff_m3, -R[fc], -R.eca_gain_ha] + ([R.heat_c] if heat is not None else []))
         R["on_exact_front"] = pareto_mask(Fe)
         lo, hi = Fe[R.on_exact_front].min(axis=0), Fe[R.on_exact_front].max(axis=0)
