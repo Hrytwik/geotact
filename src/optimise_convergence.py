@@ -118,8 +118,9 @@ def exact_archive():
     rows = []
     for i, x in enumerate(z["X"]):
         rows.append(op.exact_row(data, x, ids, d, cand, blocks, base, built_px, energy, heat))
-        if i % 500 == 0:
-            print(f"  exact {i}/{len(z['X'])}", flush=True)
+        if (i + 1) % 100 == 0 or i + 1 == len(z["X"]):
+            import time
+            print(f"  exact {i + 1}/{len(z['X'])} at {time.strftime('%H:%M:%S')}", flush=True)
     R = pd.DataFrame(rows)
     Fe = np.column_stack([R.runoff_m3, -R.food_gj, -R.eca_gain_ha, R.heat_c])
     R["on_exact_front"] = op.pareto_mask(Fe)
