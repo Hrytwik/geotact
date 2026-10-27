@@ -17,18 +17,21 @@ uv pip install --python .venv/bin/python -r requirements.lock.txt
 
 The machine used was an 8 GB Apple-silicon Mac; heavy steps call `memory_guard(...)` and must be run ONE AT A TIME.
 
-## 2. Inputs that cannot be downloaded (kept in the repository)
+## 2. Inputs that cannot be downloaded
 
-| Input | Where | What it is |
-|---|---|---|
-| Ward map GeoPDF | `Ward_Map_1.pdf` | BMC ward map; wards, drains and water bodies are extracted from it (step T0) |
-| City Sanitation Plan | `Bhubaneswar-CSP-NIUA.pdf` | source of the 16 waterlogging hotspots WL1-WL16 (Fig. 10) |
-| Field-survey flood points | `data/interim/panigrahi2026_fig3_points.csv` | digitised from Fig. 3 of Panigrahi, Pal and Sharma (2026), AIMS Geosciences 12(1) |
-| Urban waterlogging places | `docs/urban_waterlogging_points.csv` | audited newspaper/report places (audit in build_plan, 22 Oct) |
-| 300 land-use hand labels | `validation/validation_labels.xlsx` + `strata_*.csv` | stratified random sample, labelled by the first author in Google Earth |
-| 40 tree-loss hand labels | `validation/tree_loss_labels.xlsx` + key | targeted check of the U-Net tree-loss map |
-| 100 vegetation-loss labels | `validation/vegetation_check/` | stratified random check of the T15 loss map |
-| State yields | `data/raw/external/moa/` | Agricultural Statistics at a Glance 2024-25 (downloaded by `glance`, kept because the site is unstable) |
+`data/` is git-ignored (8 GB of rasters), so check the "In git" column: inputs marked "no" must be copied over by hand.
+
+| Input | Where | In git | What it is |
+|---|---|---|---|
+| Ward map GeoPDF | `Ward_Map_1.pdf` | no (third-party document, kept locally) | BMC ward map; wards, drains and water bodies are extracted from it (step T0) |
+| City Sanitation Plan | `Bhubaneswar-CSP-NIUA.pdf` | no (third-party document, kept locally) | source of the 16 waterlogging hotspots WL1-WL16 (Fig. 10) |
+| Field-survey flood points | `data/interim/panigrahi2026_fig3_points.csv` / `.gpkg` | yes (force-added 2026-10-27) | digitised from Fig. 3 of Panigrahi, Pal and Sharma (2026), AIMS Geosciences 12(1); the paper itself is `data/raw/external/panigrahi2026_geosci-12-01-005.pdf` (not in git) |
+| Urban waterlogging places | `docs/urban_waterlogging_points.csv` | yes | audited newspaper/report places (audit in build_plan, 22 Oct) |
+| 300 land-use hand labels | `validation/validation_labels.xlsx` + `strata_*.csv` | yes | stratified random sample, labelled by the first author in Google Earth |
+| 40 tree-loss hand labels | `validation/tree_loss_labels.xlsx` + key | yes | targeted check of the U-Net tree-loss map |
+| 100 vegetation-loss labels | `validation/vegetation_check/` | yes | stratified random check of the T15 loss map |
+| State yields | `data/raw/external/moa/` | no (10 MB PDF; re-downloadable with `glance` while the site is up) | Agricultural Statistics at a Glance 2024-25 |
+| Food energy values | `data/raw/external/usda_fdc.json` | no (re-fetched by the food code) | USDA FoodData Central values used in T14 |
 
 Files named `*_private_do_not_open.csv` hold the sample design (strata, pixel positions). They are read only by the scoring code.
 
