@@ -73,3 +73,7 @@ The raw and derived rasters (`data/`, about 8 GB) and the model outputs (`output
 - **Report failures as they are.** The vegetation area check failed; the flood model misses the official hotspots; deep learning did not beat simple models for flood and vegetation; the bird-habitat layer was not adopted. The chapter's credibility comes from saying this plainly.
 - **Follow the "do not say" list** in `docs/WRITING_GUIDE.md` §8.
 - **Do not add a reference without checking it** by DOI or the original document.
+
+## Licence
+
+Code and repository content: MIT (see `LICENSE`). Third-party data are not redistributed here; each source keeps its own licence (see `REPRODUCE.md` and `docs/references.md`).
