@@ -12,7 +12,7 @@ Python 3.12.13 in a uv virtual environment. Exact package versions are pinned in
 ```
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -r requirements.lock.txt
-.venv/bin/python -m pytest -q          # 300+ tests, all on synthetic data, no downloads needed
+.venv/bin/python -m pytest -q          # 308 tests; 267 run on synthetic data, 41 skip until the rasters are downloaded
 ```
 
 The machine used was an 8 GB Apple-silicon Mac; heavy steps call `memory_guard(...)` and must be run ONE AT A TIME.

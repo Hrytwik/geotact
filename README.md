@@ -17,7 +17,7 @@ Ridanshi Agarwal, Hritwik Bali and Parthiban Krishnamoorthy, School of Computer 
 | Flood susceptibility | Spatial-CV AUC up to 0.785 on 129 field-surveyed flood sites. It does not reproduce the municipality's 16 documented waterlogging hotspots | Field survey; City Sanitation Plan hotspots |
 | Graph twin | 475 nodes (14 water, 371 green, 90 farm) with yearly history. It rebuilds from each new clear Sentinel-2 window | Three dated snapshots |
 | Scenarios and optimisation | A four-objective NSGA-II search (runoff, food energy, habitat connectivity, heat exposure). About 30% of front plans improve all four objectives over today. Gains at a 150 ha budget are modest | 16,142 plans re-evaluated exactly; stable under a 33× longer search |
-| Reproducibility | A fresh install from the lock file passes the full test suite and rebuilds the land-use map with zero differing pixels | `pytest`, 308 tests |
+| Reproducibility | A fresh install from the lock file passes the full test suite and rebuilds the land-use map with zero differing pixels | `pytest` on the full data: 308 tests |
 
 Failures are reported as they are. The full record of each test, rule and outcome is in [`docs/results_log.md`](docs/results_log.md); search it by task id (T7, T15, T19b and so on).
 
@@ -26,7 +26,7 @@ Failures are reported as they are. The full record of each test, rule and outcom
 ```
 geotact/
 ├── src/                  one module per task; the first docstring line names the task id
-├── tests/                308 tests on synthetic data (no downloads needed)
+├── tests/                308 tests; 267 run on synthetic data alone, the rest skip unless the downloaded rasters are present
 ├── validation/           hand labels and sampling design (see validation/README.md)
 ├── data/interim/         small derived inputs: the digitised field-survey flood points
 ├── docs/
@@ -43,7 +43,7 @@ geotact/
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.lock.txt
-python -m pytest -q              # synthetic data only
+python -m pytest -q              # 267 pass on synthetic data; 41 skip without the downloaded rasters
 ```
 
 Rebuilding the maps needs several gigabytes of satellite and elevation downloads, and heavy steps are run one at a time on an 8 GB machine. `REPRODUCE.md` lists every download, the order of steps and the expected outputs.

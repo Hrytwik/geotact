@@ -17,7 +17,7 @@ def _cfg(city=None):
 def test_default_is_bhubaneswar_with_the_original_folders():
     c = _cfg()
     assert c["city"] == "bhubaneswar" and c["bbox"] == [85.70, 20.15, 85.93, 20.41]
-    assert c["raw"].endswith("data/raw") and c["out"].endswith("outputs") and c["home"] == c["out"]
+    assert c["raw"].replace("\\", "/").endswith("data/raw") and c["out"].endswith("outputs") and c["home"] == c["out"]
 
 
 def test_cuttack_has_its_own_box_and_folders_but_models_load_from_home():
@@ -33,4 +33,4 @@ def test_validation_points_never_write_into_the_bhubaneswar_label_folder_for_ano
     assert out[0].endswith("validation_cuttack") and out[1] == "150" and out[2] == "20"
     env.pop("GEOTACT_CITY")
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, check=True).stdout.strip().split("|")
-    assert out[0].endswith("/validation") and out[1] == "300" and out[2] == "40"
+    assert out[0].replace("\\", "/").endswith("/validation") and out[1] == "300" and out[2] == "40"
