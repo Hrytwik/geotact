@@ -1,6 +1,6 @@
 """T6e: ONE-SHOT test of the frozen susceptibility model against the sanitation-plan waterlogging hotspots.
 
-Protocol (docs/build_plan.md, registered before any model existed): for each of the 16 hotspots take the maximum
+Protocol (docs/results_log.md, registered before any model existed): for each of the 16 hotspots take the maximum
 susceptibility percentile within 150 m of its point(s); percentiles are ranks over all BMC cells except mapped water.
 AMENDED 2026-10-21, BEFORE the real test was run: the registered aggregator was the MAXIMUM percentile in the 150 m disk, but a 150 m
 disk holds ~81 cells, so on a random score that statistic averages 98.6 and the >= 70 bar is vacuous. The aggregator is now the

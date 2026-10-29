@@ -3,7 +3,7 @@
 > **Summary:** Ordered command runbook (environment -> downloads -> every build step T0-T19 -> every table the chapter quotes), the data sources each download uses, the hand-made inputs that cannot be downloaded, and which steps were actually re-run to check this runbook.
 > **Last updated:** 2026-10-29 (GEOTACT_CONTACT for downloads; third-party documents are local-only; written in improvement round 3, item T20)
 
-Every protocol, decision rule and result referred to here is in `docs/build_plan.md` (search the task id, e.g. `T7`). Tests: `python -m pytest -q`.
+Every protocol, decision rule and result referred to here is in `docs/results_log.md` (search the task id, e.g. `T7`). Tests: `python -m pytest -q`.
 
 ## 1. Environment
 
@@ -26,7 +26,7 @@ The machine used was an 8 GB Apple-silicon Mac; heavy steps call `memory_guard(.
 | Ward map GeoPDF | `Ward_Map_1.pdf` | no (third-party document, kept locally) | BMC ward map; wards, drains and water bodies are extracted from it (step T0) |
 | City Sanitation Plan | `docs/submission/Bhubaneswar_City_Sanitation_Plan_NIUA.pdf` | no (third-party document, kept locally) | source of the 16 waterlogging hotspots WL1-WL16 (Fig. 10) |
 | Field-survey flood points | `data/interim/panigrahi2026_fig3_points.csv` / `.gpkg` | yes (force-added 2026-10-27) | digitised from Fig. 3 of Panigrahi, Pal and Sharma (2026), AIMS Geosciences 12(1); the paper itself is `data/raw/external/panigrahi2026_geosci-12-01-005.pdf` (not in git) |
-| Urban waterlogging places | `docs/urban_waterlogging_points.csv` | yes | audited newspaper/report places (audit in build_plan, 22 Oct) |
+| Urban waterlogging places | `docs/urban_waterlogging_points.csv` | yes | audited newspaper/report places (audit in docs/results_log.md, 22 Oct) |
 | 300 land-use hand labels | `validation/validation_labels.xlsx` + `strata_*.csv` | yes | stratified random sample, labelled by the first author in Google Earth |
 | 40 tree-loss hand labels | `validation/tree_loss_labels.xlsx` + key | yes | targeted check of the U-Net tree-loss map |
 | 100 vegetation-loss labels | `validation/vegetation_check/` | yes | stratified random check of the T15 loss map |
@@ -110,4 +110,4 @@ Seeds are fixed in the code, so the scoring steps are deterministic. U-Net train
 
 ## 5. Re-run checks of this runbook
 
-See the T20 RESULT paragraph in `docs/build_plan.md` for which steps were re-run on 2026-10-27 and whether their outputs matched the committed numbers.
+See the T20 RESULT paragraph in `docs/results_log.md` for which steps were re-run on 2026-10-27 and whether their outputs matched the committed numbers.

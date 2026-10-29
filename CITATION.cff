@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite it as below."
+title: "geotact: GeoAI urban digital twin for Bhubaneswar"
+type: software
+authors:
+  - family-names: Agarwal
+    given-names: Ridanshi
+    affiliation: "School of Computer Science and Engineering, Vellore Institute of Technology, Vellore, Tamil Nadu, India"
+  - family-names: Bali
+    given-names: Hritwik
+    affiliation: "School of Computer Science and Engineering, Vellore Institute of Technology, Vellore, Tamil Nadu, India"
+  - family-names: Krishnamoorthy
+    given-names: Parthiban
+    affiliation: "School of Computer Science and Engineering, Vellore Institute of Technology, Vellore, Tamil Nadu, India"
+repository-code: "https://github.com/Hrytwik/geotact"
+license: MIT
+abstract: "Open-data GeoAI urban digital twin for Bhubaneswar, Odisha, coupling blue-green infrastructure, urban agriculture and biodiversity, with validation labels, tests and result tables."
+keywords:
+  - digital twin
+  - GeoAI
+  - blue-green infrastructure
+  - multi-objective optimisation
+  - Sentinel-2

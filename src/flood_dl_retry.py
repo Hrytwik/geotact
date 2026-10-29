@@ -1,4 +1,4 @@
-"""T6k: flood deep-learning retry (protocol in docs/build_plan.md): CNN with extra urban positives, transfer learning from the
+"""T6k: flood deep-learning retry (protocol in docs/results_log.md): CNN with extra urban positives, transfer learning from the
 land-use U-Net encoder, a tuned CNN, and a learning-curve diagnostic. Torch process (no LightGBM)."""
 import numpy as np
 

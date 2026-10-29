@@ -1,4 +1,4 @@
-"""T6c: flood evidence per radar scene -> per-pixel flood frequency (protocol in docs/build_plan.md).
+"""T6c: flood evidence per radar scene -> per-pixel flood frequency (protocol in docs/results_log.md).
 
 Change detection is always against the SAME orbit's dry-season scenes (two tracks: relative orbits 85 and 121).
 Pure numpy/pandas apart from run(); nothing here imports torch."""

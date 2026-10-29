@@ -1,4 +1,4 @@
-"""T10: multi-objective choice of intervention sites with NSGA-II (design registered in docs/build_plan.md).
+"""T10: multi-objective choice of intervention sites with NSGA-II (design registered in docs/results_log.md).
 
 Each eligible 1 ha block takes one option: 0 none, 1 wetland, 2 garden, 3 corridor. Runoff and food change are exact sums over
 blocks; connectivity uses a first-order surrogate (sum of single-block gains) during the search and is re-evaluated exactly on

@@ -1,5 +1,5 @@
 """T6f: samples and input channels for the deep flood model trained on field-surveyed flood locations (protocol registered in
-docs/build_plan.md). 30 m cells on the DEM grid. Absolute elevation is NOT a channel (it carried regional position, not
+docs/results_log.md). 30 m cells on the DEM grid. Absolute elevation is NOT a channel (it carried regional position, not
 flooding, in T6d); local relief is. No torch and no LightGBM here: the CNN and the LightGBM baseline run in separate processes."""
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view

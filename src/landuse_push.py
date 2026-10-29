@@ -1,4 +1,4 @@
-"""T13: land-use accuracy push with any method (protocol in docs/build_plan.md). Candidate feature sets x learners, scored on the 300
+"""T13: land-use accuracy push with any method (protocol in docs/results_log.md). Candidate feature sets x learners, scored on the 300
 hand labels with the T7 stratified estimator; the headline is NESTED selection (the candidate for each held-out fold is chosen on the
 training folds only). No torch here: the spring-2026 ensemble probabilities come from the live pipeline (T12)."""
 import json

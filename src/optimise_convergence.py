@@ -1,4 +1,4 @@
-"""T19: convergence of the T14 NSGA-II search (protocol in docs/build_plan.md). Seeds x generation budgets on the cached site data,
+"""T19: convergence of the T14 NSGA-II search (protocol in docs/results_log.md). Seeds x generation budgets on the cached site data,
 hypervolume of each front in one fixed normalisation (the non-dominated union of every run)."""
 import json
 

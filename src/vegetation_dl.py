@@ -1,4 +1,4 @@
-"""T5d: spatio-temporal deep model for tree-cover loss from the greenness time series (protocol in docs/build_plan.md).
+"""T5d: spatio-temporal deep model for tree-cover loss from the greenness time series (protocol in docs/results_log.md).
 
 A U-Net reads 4 consecutive offset-corrected NDVI seasons and predicts other / stable tree / tree loss; weak labels come from
 the Esri annual maps (2018-2021, 2019-2022, 2020-2023 windows); the 2022-23 to 2025-26 window is scored against the authors'

@@ -1,4 +1,4 @@
-"""T6g: the deep flood models (a patch CNN and a tabular MLP) with the training settings registered in docs/build_plan.md
+"""T6g: the deep flood models (a patch CNN and a tabular MLP) with the training settings registered in docs/results_log.md
 (Amendment 1b). torch, CPU only. Own process: LightGBM and the other baselines live in flood_cnn_baselines.py."""
 import numpy as np
 import torch

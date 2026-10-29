@@ -116,7 +116,7 @@ def terrain_features(dem, transform, crs, channels=None, acc_threshold=None):
 
 
 # ---------------------------------------------------------------- real study area
-ACC_THRESHOLD = 300          # contributing cells (0.27 sq km); decision recorded in docs/build_plan.md
+ACC_THRESHOLD = 300          # contributing cells (0.27 sq km); decision recorded in docs/results_log.md
 BANDS = ["elevation", "slope_deg", "laplacian", "log10_acc_m2", "twi", "hand", "dist_drain", "dist_river",
          "dist_water", "dist_channel"]
 

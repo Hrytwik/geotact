@@ -1,4 +1,4 @@
-"""T9: scenario engine for the twin (design registered in docs/build_plan.md): wetland restoration, community gardens and tree
+"""T9: scenario engine for the twin (design registered in docs/results_log.md): wetland restoration, community gardens and tree
 corridors as edits to the land-use map, scored on runoff (SDG 11 proxy), food-potential area (SDG 2 proxy), public open space
 (SDG 11.7.1 proxy) and habitat connectivity. Uncalibrated screening tools, not forecasts."""
 import numpy as np

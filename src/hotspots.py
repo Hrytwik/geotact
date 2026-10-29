@@ -8,7 +8,7 @@ returned one unrelated institute for five different neighbourhoods.
 
 Four hotspots whose names are ambiguous (WL3, WL6, WL10, WL11: several Behera Sahi / Sabar Sahi in
 the city, Odia spelling variants) were later moved to coordinates supplied by the authors on 2026-10-21
-and checked against the BMC beat list, the ward map and press reports (docs/verification_round1.md).
+and checked against the BMC beat list, the ward map and press reports (the source checks in the authors' notes).
 Those entries use ("xy", lat, lon) instead of a map label.
 
 Each point is a locality-level position, so uncertainty is a few hundred metres;

@@ -1,4 +1,4 @@
-"""T6d: monsoon surface-water susceptibility model on terrain and hydrology features (protocol in docs/build_plan.md).
+"""T6d: monsoon surface-water susceptibility model on terrain and hydrology features (protocol in docs/results_log.md).
 
 Training unit: 30 m cells on the DEM grid. Label: monsoon surface-water frequency (NOT flood extent: the radar
 label follows the paddy calendar, not the rain). Built-up share is deliberately not a feature. LightGBM runs only in

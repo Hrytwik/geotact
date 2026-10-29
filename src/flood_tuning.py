@@ -1,4 +1,4 @@
-"""T6i: nested hyper-parameter search, soft vote and stacking for the flood models (protocol: Amendment 2 in docs/build_plan.md).
+"""T6i: nested hyper-parameter search, soft vote and stacking for the flood models (protocol: Amendment 2 in docs/results_log.md).
 No torch here. For every outer spatial fold the parameters are chosen by an inner spatial CV on the remaining folds only; the outer
 fold is scored once, by a model refitted on all remaining folds."""
 import itertools

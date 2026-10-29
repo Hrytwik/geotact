@@ -1,4 +1,4 @@
-"""T6j Part B: urban street-flooding model (protocol: Amendments 2 and 2a in docs/build_plan.md). Sample assembly, the training
+"""T6j Part B: urban street-flooding model (protocol: Amendments 2 and 2a in docs/results_log.md). Sample assembly, the training
 regimes and the two evaluation tasks. No torch here (LightGBM runs in this process)."""
 import numpy as np
 import pandas as pd

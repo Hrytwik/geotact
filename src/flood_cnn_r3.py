@@ -1,4 +1,4 @@
-"""T6h: ONE-SHOT hotspot test (R3) for every benchmark model (Amendment 1 in docs/build_plan.md). Same statistic, null and
+"""T6h: ONE-SHOT hotspot test (R3) for every benchmark model (Amendment 1 in docs/results_log.md). Same statistic, null and
 reference as T6e (src/flood_hotspots.py): percentile of the score among BMC cells that are not mapped water, mean over a 150 m disk,
 maximum over each hotspot's points, mean over the 16 hotspots, 5000 random hotspot sets. The result is REPORTED for every model
 and never used to rank or select; p-values are given uncorrected and Holm-corrected across the models tested. No torch here.

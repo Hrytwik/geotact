@@ -1,4 +1,4 @@
-"""T14 food: food energy produced by cropland and community gardens from cited yields (docs/build_plan.md T14 addendum). Yields come from
+"""T14 food: food energy produced by cropland and community gardens from cited yields (docs/results_log.md T14 addendum). Yields come from
 the Ministry of Agriculture's 'Agricultural Statistics at a Glance 2024-25' (Odisha), energy densities from USDA FoodData Central."""
 import json
 

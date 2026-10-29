@@ -1,4 +1,4 @@
-"""T12: live twin (protocol in docs/build_plan.md). Each version = newest clear Sentinel-2 window -> land-use product (no retraining)
+"""T12: live twin (protocol in docs/results_log.md). Each version = newest clear Sentinel-2 window -> land-use product (no retraining)
 -> T8 twin -> change report against the previous version -> rainfall-forecast runoff outlook; versions are append-only.
 
 Usage: python -m src.live --tag 2023 --composite 2023 --window 2023-01-01 2023-12-31

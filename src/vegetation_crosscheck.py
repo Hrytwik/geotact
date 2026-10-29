@@ -1,5 +1,5 @@
 """T5b: cross-check of the land-use U-Net's tree loss (2023 -> 2025-26) against the offset-corrected NDVI change (protocol in
-docs/build_plan.md). Both products come from Sentinel-2, so this is corroboration, not independent validation, and not accuracy."""
+docs/results_log.md). Both products come from Sentinel-2, so this is corroboration, not independent validation, and not accuracy."""
 import numpy as np
 import pandas as pd
 from scipy.stats import rankdata, spearmanr

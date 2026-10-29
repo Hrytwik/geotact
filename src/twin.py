@@ -1,4 +1,4 @@
-"""T8: graph twin of Bhubaneswar's water, green (habitat) and farm patches (design registered in docs/build_plan.md).
+"""T8: graph twin of Bhubaneswar's water, green (habitat) and farm patches (design registered in docs/results_log.md).
 
 Nodes are connected patches of the land-use map; attributes carry their history, greenness, flood exposure, land-use reliability
 and biodiversity records; edges link touching patches, habitat patches within dispersal reach, and patches along the same drain."""

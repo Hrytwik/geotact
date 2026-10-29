@@ -1,4 +1,4 @@
-"""T6a: Sentinel-1 flood evidence (see the T6 protocol in docs/build_plan.md).
+"""T6a: Sentinel-1 flood evidence (see the T6 protocol in docs/results_log.md).
 
 Per scene: backscatter in dB, 3x3 median speckle filter, a scene-specific water threshold calibrated on
 permanent-water versus vegetated-land reference pixels, and change detection against the dry-season median of the

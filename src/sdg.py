@@ -1,4 +1,4 @@
-"""T9b: official-style SDG indicators (protocol in docs/build_plan.md): 11.3.1 land consumption vs population growth (GHSL),
+"""T9b: official-style SDG indicators (protocol in docs/results_log.md): 11.3.1 land consumption vs population growth (GHSL),
 11.7.1 share of the urbanised area that is public space (streets + open space), 15.1.1 forest share of land area."""
 import numpy as np
 from scipy import ndimage as ndi

@@ -1,4 +1,4 @@
-"""T6g baselines for the deep flood model (protocol in docs/build_plan.md): LightGBM and logistic regression on centre-cell
+"""T6g baselines for the deep flood model (protocol in docs/results_log.md): LightGBM and logistic regression on centre-cell
 features plus 9 x 9 means, single-layer scores, and the frozen T6d susceptibility. Own process: no torch."""
 import numpy as np
 from scipy import ndimage as ndi

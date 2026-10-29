@@ -1,4 +1,4 @@
-"""T15: vegetation-loss map and its design-based accuracy check (protocol in docs/build_plan.md). The loss threshold is frozen from the
+"""T15: vegetation-loss map and its design-based accuracy check (protocol in docs/results_log.md). The loss threshold is frozen from the
 38 T5c points before any new label; a blind stratified random sample (loss / no loss) is labelled by the authors; Olofsson-style estimators
 give precision, recall, overall accuracy and the loss area."""
 import json

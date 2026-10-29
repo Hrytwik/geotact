@@ -1,4 +1,4 @@
-"""T4c: attempts to raise land-use accuracy (protocol in docs/build_plan.md): an ensemble of the four U-Nets, a multi-season
+"""T4c: attempts to raise land-use accuracy (protocol in docs/results_log.md): an ensemble of the four U-Nets, a multi-season
 U-Net (2023 bands plus 8 NDVI seasons) and a correction model trained on the 300 hand labels with spatial cross-validation."""
 import numpy as np
 

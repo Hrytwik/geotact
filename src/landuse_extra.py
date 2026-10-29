@@ -1,5 +1,5 @@
 """T18: the T4c land-use correction model retrained with the T15 vegetation-check points as extra TRAINING labels (protocol in
-docs/build_plan.md). Scored only on the 300 designed labels, with the T4c folds; extras inside a test fold's 4 km blocks are left out."""
+docs/results_log.md). Scored only on the 300 designed labels, with the T4c folds; extras inside a test fold's 4 km blocks are left out."""
 import json
 
 import numpy as np

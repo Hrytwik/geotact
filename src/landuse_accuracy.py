@@ -1,4 +1,4 @@
-"""T7: accuracy of the land-use maps from the authors' 300 hand labels (protocol in docs/build_plan.md). Stratified random sample
+"""T7: accuracy of the land-use maps from the authors' 300 hand labels (protocol in docs/results_log.md). Stratified random sample
 with strata = Esri/IO 2023 classes; estimators after Olofsson et al. (2014) and Stehman (2014); ratio-estimator variances."""
 import numpy as np
 import pandas as pd

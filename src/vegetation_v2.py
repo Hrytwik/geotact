@@ -1,4 +1,4 @@
-"""T17: correction model for the T15 vegetation-loss map (protocol in docs/build_plan.md). A small design-weighted logistic regression
+"""T17: correction model for the T15 vegetation-loss map (protocol in docs/results_log.md). A small design-weighted logistic regression
 on six per-pixel features, trained on the 100 T15 labels and scored out of fold (spatial blocks, repeated, majority vote) with the
 T15 stratified estimators and a paired stratified bootstrap against the frozen map."""
 import json

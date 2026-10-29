@@ -1,4 +1,4 @@
-"""T12b: bias-aware bird-habitat layer (protocol in docs/build_plan.md). Units are birding visits (place + day); the response is whether
+"""T12b: bias-aware bird-habitat layer (protocol in docs/results_log.md). Units are birding visits (place + day); the response is whether
 a visit's list holds a guild (AVONET habitat), effort is the number of other species on the list (List Length Analysis), habitat is
 the land-use mix within 250 m. Comparing visits with visits removes most of the where-birders-go bias. No torch."""
 import json
