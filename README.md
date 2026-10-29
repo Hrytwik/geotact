@@ -14,7 +14,7 @@
 7. **`docs/references.md`:** verified references (APA-style entries; cite in text as Harvard with no comma, e.g. (Batty 2018)).
 8. **`docs/build_plan.md`:** the full record. Every test's rule was written before its result, and every result is recorded with its date. Search by task id (T7, T15, T19b...). It is long; read only the sections you need.
 
-The format documents are in **`docs/submission/`**: the Springer guideline, the sample chapter, the accepted abstract and the City Sanitation Plan.
+The format documents (Springer guideline, sample chapter, accepted abstract with author contacts, City Sanitation Plan) and the BMC ward map are **not in this public repository**: they are third-party or contain personal details. Ask Hritwik for them; their rules are summarised in `docs/WRITING_GUIDE.md` §2.
 
 ## What was built (one paragraph)
 
@@ -46,7 +46,6 @@ geotact/
 ├── REPRODUCE.md               how to rebuild everything (environment, downloads, commands in order)
 ├── PLAN.md                    work queue and round-by-round history
 ├── requirements.lock.txt      exact package versions (Python 3.12)
-├── Ward_Map_1.pdf             BMC ward map GeoPDF (read by src/wardmap.py)
 ├── src/                       one module per task (docstring line 1 names the task id)
 ├── tests/                     308 tests, synthetic data only
 ├── validation/                hand labels: 300 land-use points, 40 tree-loss points, 100 vegetation-change points
@@ -60,7 +59,6 @@ geotact/
     ├── references.md          verified reference list
     ├── verification_round1.md source checks of user-supplied claims
     ├── chapter/               chapter text drafts
-    ├── submission/            Springer guideline, sample chapter, accepted abstract, sanitation plan
     ├── figures/               the 8 chapter figures (TIFF/PNG/EPS) + captions.md
     └── *.csv                  result tables quoted in the chapter
 ```

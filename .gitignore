@@ -7,3 +7,7 @@ __pycache__/
 outputs_cuttack/
 data/cuttack/
 logs/
+
+# Third-party and personal documents: kept locally, never committed (removed from history 2026-10-29)
+docs/submission/
+Ward_Map_1.pdf

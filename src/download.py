@@ -28,7 +28,7 @@ from src.config import BBOX, CRS, PC_STAC, RAW, RES_10, RES_30, S2_BANDS, S2_SCL
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 dask.config.set(num_workers=2)  # 8 GB RAM machine
-UA = {"User-Agent": "geotact-research/0.1 ([contact email removed])"}
+UA = {"User-Agent": "geotact-research/0.1" + (f" ({os.environ['GEOTACT_CONTACT']})" if os.environ.get("GEOTACT_CONTACT") else "")}  # contact for API operators
 
 
 def log(msg):

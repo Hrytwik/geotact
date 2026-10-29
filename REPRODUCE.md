@@ -1,7 +1,7 @@
 # Reproduce the Bhubaneswar GeoAI twin from scratch
 
 > **Summary:** Ordered command runbook (environment -> downloads -> every build step T0-T19 -> every table the chapter quotes), the data sources each download uses, the hand-made inputs that cannot be downloaded, and which steps were actually re-run to check this runbook.
-> **Last updated:** 2026-10-27 (written in improvement round 3, item T20)
+> **Last updated:** 2026-10-29 (GEOTACT_CONTACT for downloads; third-party documents are local-only; written in improvement round 3, item T20)
 
 Every protocol, decision rule and result referred to here is in `docs/build_plan.md` (search the task id, e.g. `T7`). Tests: `python -m pytest -q`.
 
@@ -24,7 +24,7 @@ The machine used was an 8 GB Apple-silicon Mac; heavy steps call `memory_guard(.
 | Input | Where | In git | What it is |
 |---|---|---|---|
 | Ward map GeoPDF | `Ward_Map_1.pdf` | no (third-party document, kept locally) | BMC ward map; wards, drains and water bodies are extracted from it (step T0) |
-| City Sanitation Plan | `Bhubaneswar-CSP-NIUA.pdf` | no (third-party document, kept locally) | source of the 16 waterlogging hotspots WL1-WL16 (Fig. 10) |
+| City Sanitation Plan | `docs/submission/Bhubaneswar_City_Sanitation_Plan_NIUA.pdf` | no (third-party document, kept locally) | source of the 16 waterlogging hotspots WL1-WL16 (Fig. 10) |
 | Field-survey flood points | `data/interim/panigrahi2026_fig3_points.csv` / `.gpkg` | yes (force-added 2026-10-27) | digitised from Fig. 3 of Panigrahi, Pal and Sharma (2026), AIMS Geosciences 12(1); the paper itself is `data/raw/external/panigrahi2026_geosci-12-01-005.pdf` (not in git) |
 | Urban waterlogging places | `docs/urban_waterlogging_points.csv` | yes | audited newspaper/report places (audit in build_plan, 22 Oct) |
 | 300 land-use hand labels | `validation/validation_labels.xlsx` + `strata_*.csv` | yes | stratified random sample, labelled by the first author in Google Earth |
@@ -36,6 +36,8 @@ The machine used was an 8 GB Apple-silicon Mac; heavy steps call `memory_guard(.
 Files named `*_private_do_not_open.csv` hold the sample design (strata, pixel positions). They are read only by the scoring code.
 
 ## 3. Downloads (`python -m src.download <name> ...` or `all`)
+
+Set `GEOTACT_CONTACT=<your email>` before downloading: public APIs (Overpass, GBIF) ask for a contact address in the User-Agent; without it, requests go out without one.
 
 | Name | Source |
 |---|---|
